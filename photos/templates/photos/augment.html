@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Augment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <style>
+        .links{
+            color: inherit;
+            text-decoration: inherit;
+            display: block;
+        }
+        .mycont{
+            max-width: 1500px;
+
+        }
+        .accordion-button:not(.collapsed){
+            background: #F3F3F3;
+
+        }
+        .accordion-button:focus{
+            box-shadow: inherit;
+        }
+       
+
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container mycont mt-5 mx-2">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="card my-2">
+                    <div class="card-header">
+                        Select augmentation
+                    </div>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="true" aria-controls="flush-collapseOne">
+                                        Custom augmentation
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseOne" class="accordion-collapse collapse show" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                    <div>
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <a class="links" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapseExample">Color augmentations</a>
+                                                <div class="collapse" id="collapse1">
+                                                    <div class="m-3" >
+                                                        <div class="form-check" id="0" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="solarize" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Solarize
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check" id="1" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="posterize" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckChecked">
+                                                            Posterize
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            
+                                            
+                                            <li class="list-group-item">
+                                                <a class="links" data-bs-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapseExample">Affine augmentations</a>
+                                                <div class="collapse" id="collapse2">
+                                                    <div class="m-3" >
+                                                        <div class="form-check" id="2" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="translatex" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Translate X
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check" id="3" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="translatey" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Translate Y
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check" id="4" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="shearx" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Shear x
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check" id="5" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="sheary" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Shear Y
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <a class="links" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapseExample">Flip and rotate augmentations</a>
+                                                <div class="collapse" id="collapse3">
+                                                    <div class="m-3" >
+                                                        <div class="form-check" id="6" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="flipx" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Flip horizontal
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check" id="7" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="flipy" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Flip vertical
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check" id="8" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="rotate" id="flexCheckDefault">
+                                                            <label class="form-check-label" for="flexCheckDefault">
+                                                            Rotate
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="flush-headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                                        Premade augmentation
+                                    </button>
+                                </h2>
+                                <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+                                    <div class="accordion-body">
+                                        <div class="m-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                                                <label class="form-check-label" for="flexSwitchCheckDefault">Randaugment</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="p-1">
+                            <button type="submit" class='btn btn-dark col-12'>Augment</button>
+                        </div>
+                    </form>    
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <h2 id="mouseover">Mouseover for a preview</h2>
+                <img alt="preview image" id="img">
+            </div>
+        </div>
+    </div>
+    <script>
+        $("#img").hide();
+        var imgArray = new Array();
+        var i;
+        for(i=0;i<2;i++){
+            imgArray[i] = new Image();
+            imgArray[i].src = '../../static/images/preview'+ i +'.png';
+        }
+
+        function mouseover(index){
+            $("#mouseover").hide();
+            document.getElementById("img").src = imgArray[index].src
+            $("#img").show();
+        }
+
+        function mouseout(index){
+            $("#img").hide();
+            $("#mouseover").show();
+        }
+
+       
+    </script>
+   
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js" integrity="sha384-cn7l7gDp0eyniUwwAZgrzD06kc/tftFf19TOAs2zVinnD/C7E91j9yyk5//jjpt/" crossorigin="anonymous"></script>
+
+</body>
+</html>

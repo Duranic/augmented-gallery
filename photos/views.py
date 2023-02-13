@@ -9,6 +9,34 @@ from imgaug import augmenters as iaa
 import numpy as np
 import base64
 
+def selectAugmentations(request):
+    if(request.method=="POST"):
+        augmentations=request.POST.getlist('augmentations')
+        augmenters=[]
+        for augmentation in augmentations:
+            match (augmentation):
+                case 'solarize':
+                    print("selected solarize")
+                case 'posterize':
+                    print("selected posterize")
+                case 'translatex':
+                    print("selected translatex")
+                case 'translatey':
+                    print("selected translatey")
+                case 'shearx':
+                    print("selected shearx")
+                case 'sheary':
+                    print("selected sheary")
+                case 'flipx':
+                    print("selected flipx")
+                case 'flipy':
+                    print("selected flipy")
+                case 'rotate':
+                    print("selected rotate")
+                case _:
+                    print("illegal state")
+    return render(request, "photos/augment.html")
+
 def registerPage(request):
     form=CreateUserForm()
 
@@ -57,9 +85,8 @@ def viewPhoto(request, pk):
     photo = Photo.objects.get(id=pk)
     
     if request.method == 'POST':
-        photourl="../static"+photo.image.url
-        url=os.path.join(settings.PROJECT_ROOT, photourl)
-        print(url)
+        photourl=os.path.normpath("..\\static"+photo.image.url)
+        url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
         img = cv.imread(url)
         seq = iaa.Sequential([
             iaa.Crop(px=(0, 100)), # crop images from each side by 0 to 16px (randomly chosen)
