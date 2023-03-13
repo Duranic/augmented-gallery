@@ -12,29 +12,59 @@ import base64
 def selectAugmentations(request):
     if(request.method=="POST"):
         augmentations=request.POST.getlist('augmentations')
+        premade=request.POST.getlist('premade')
+        print(premade)
         augmenters=[]
-        for augmentation in augmentations:
-            match (augmentation):
-                case 'solarize':
-                    print("selected solarize")
-                case 'posterize':
-                    print("selected posterize")
-                case 'translatex':
-                    print("selected translatex")
-                case 'translatey':
-                    print("selected translatey")
-                case 'shearx':
-                    print("selected shearx")
-                case 'sheary':
-                    print("selected sheary")
-                case 'flipx':
-                    print("selected flipx")
-                case 'flipy':
-                    print("selected flipy")
-                case 'rotate':
-                    print("selected rotate")
-                case _:
-                    print("illegal state")
+        if (premade):
+            augmenters.append(iaa.RandAugment(n=2, m=9))
+        else:
+            for augmentation in augmentations:
+                match (augmentation):
+                    case 'solarize':
+                        augmenters.append(iaa.Solarize(0.5, threshold=(32, 128)))
+                        print(augmentation)
+                    case 'posterize':
+                        augmenters.append(iaa.Posterize(2))
+                        print(augmentation)
+                    case 'translatex':
+                        augmenters.append(iaa.TranslateX(percent=(-0.2, 0.2)))
+                        print(augmentation)
+                    case 'translatey':
+                        augmenters.append(iaa.TranslateY(percent=(-0.2, 0.2)))
+                        print(augmentation)
+                    case 'shearx':
+                        augmenters.append(iaa.ShearX((-20, 20)))
+                        print(augmentation)
+                    case 'sheary':
+                        augmenters.append(iaa.ShearY((-20, 20)))
+                        print(augmentation)
+                    case 'flipx':
+                        augmenters.append(iaa.Fliplr(0.5))
+                        print(augmentation)
+                    case 'flipy':
+                        augmenters.append(iaa.Flipud(0.5))
+                        print(augmentation)
+                    case 'rotate':
+                        augmenters.append(iaa.Affine(rotate=(-45, 45)))
+                        print(augmentation)
+                    case _:
+                        print("illegal state")
+            
+        augmentedPhotos=[]
+        photourl=os.path.normpath("..\\static"+"\\images\\tree_FD89IFe.jpg")
+        url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
+        img = cv.imread(url)
+        seq = iaa.Sequential(augmenters)
+        images=np.array([img, img, img])
+        photos=seq(images=images)
+        for photo in photos:
+            jpgphoto = cv.imencode('.jpg', photo)[1]
+            encoded=str(base64.b64encode(jpgphoto), "utf-8")
+            augmentedPhotos.append(encoded)
+        
+    
+        context = {'photo': photo, 'augmentedPhotos': augmentedPhotos}
+        return render(request, 'photos/photo.html', context)
     return render(request, "photos/augment.html")
 
 def registerPage(request):
@@ -81,17 +111,17 @@ def gallery(request):
 
 def viewPhoto(request, pk):
     augmentedPhotos=[]
-    print(len(augmentedPhotos))
     photo = Photo.objects.get(id=pk)
     
     if request.method == 'POST':
         photourl=os.path.normpath("..\\static"+photo.image.url)
+        print(photourl)
         url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
         img = cv.imread(url)
         seq = iaa.Sequential([
-            iaa.Crop(px=(0, 100)), # crop images from each side by 0 to 16px (randomly chosen)
-            iaa.Fliplr(0.7), # horizontally flip 50% of the images
-            iaa.GaussianBlur(sigma=(0, 3.0)) # blur images with a sigma of 0 to 3.0
+            iaa.TranslateX(percent=(-0.2, 0.2)),
+            iaa.ShearX((-20, 20)),
+            iaa.ShearY((-20, 20))
         ])
         images=np.array([img, img, img])
         photos=seq(images=images)
