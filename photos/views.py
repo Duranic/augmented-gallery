@@ -21,7 +21,6 @@ def selectAugmentations(request):
         augmentations=request.POST.getlist('augmentations')
         premade=request.POST.getlist('premade')
         
-        
     
         context = {'augmentations': augmentations}
         return render(request, 'photos/photo.html', context)
@@ -112,7 +111,7 @@ def logoutUser(request):
 
 def gallery(request):
     if request.user.is_authenticated==False:
-        context = {'categories': None, 'photos': None, 'user': None}
+        context = {'page':'home', 'categories': None, 'photos': None, 'user': None}
         return render(request, 'photos/gallery.html', context)
     category = request.GET.get('category')
     categories = Category.objects.all
@@ -120,7 +119,7 @@ def gallery(request):
         photos = Photo.objects.all
     else:
         photos=Photo.objects.filter(category__name=category)
-    context = {'categories': categories, 'photos': photos, 'user': request.user}
+    context = {'page':'Gallery', 'categories': categories, 'photos': photos, 'user': request.user}
     return render(request, 'photos/gallery.html', context)
 
 def viewPhoto(request, pk):
