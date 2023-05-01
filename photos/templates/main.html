@@ -23,9 +23,35 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            {% block nav %}
             
-            {% endblock nav %}
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+              <a class="nav-link {% if page == 'home' %}active{% endif %}" aria-current="page" href="{% url 'gallery' %}">Home</a>
+              </li>
+              {% if user != None %}
+              <li class="nav-item">
+              <a class="nav-link {% if page == 'add' %}active{% endif %} " href="{% url 'add' %}">Upload dataset</a>
+              </li>
+              <li class="nav-item">
+              <a class="nav-link {% if page == 'augment' %}active{% endif %}" href="{% url 'augment' %}">Augment</a>
+              </li>
+              {% else %}
+              <li class="nav-item">
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Upload dataset</a>
+              </li>
+              <li class="nav-item">
+              <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Augment</a>
+              </li>
+              {% endif %}
+          </ul>
+          {% if user != None and user != 'AnonymousUser' %}
+          <a href="{% url 'logout' %}" class="btn btn-light mx-2" >Log out</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-light mx-2" >Log in</a>
+          <a href="{% url 'register' %}" class="btn btn-light mx-2" >Register</a>
+          {% endif %}
+
+
           </div>
         </div>
       </nav>

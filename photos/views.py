@@ -31,9 +31,10 @@ def selectAugmentations(request):
         premade=request.POST.getlist('premade')
         
     
-        context = {'augmentations': augmentations}
+        context = {'page':'augment', 'augmentations': augmentations}
         return render(request, 'photos/photo.html', context)
-    return render(request, "photos/augment.html")
+    context = {'page':'augment'}
+    return render(request, "photos/augment.html", context)
 
 def augment(request):
     time.sleep(5)
@@ -116,7 +117,7 @@ def loginPage(request):
 
 def logoutUser(request):
     logout(request)
-    return redirect('login')
+    return redirect('gallery')
 
 def gallery(request):
     if request.user.is_authenticated==False:
@@ -128,7 +129,7 @@ def gallery(request):
         photos = Photo.objects.all
     else:
         photos=Photo.objects.filter(category__name=category)
-    context = {'page':'Gallery', 'categories': categories, 'photos': photos, 'user': request.user}
+    context = {'page':'home', 'categories': categories, 'photos': photos, 'user': request.user}
     return render(request, 'photos/gallery.html', context)
 
 def download(request):
@@ -246,5 +247,5 @@ def addPhoto(request):
         
         return redirect('gallery')
 
-    context = {'categories' : categories}
+    context = {'page':'add', 'categories' : categories}
     return render(request, 'photos/add.html', context)
