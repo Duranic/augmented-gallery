@@ -3,16 +3,25 @@ from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 from .models import Category, Photo
 from .forms import CreateUserForm
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from html import unescape
 from ast import literal_eval
-import time
+from django.http import HttpResponseBadRequest
+from django.views.decorators.http import require_GET
+from django.core.files.base import ContentFile
+from zipfile import ZipFile
+from io import BytesIO
+from queue import Queue
 import threading
+import time
 import cv2 as cv
 import os
 from imgaug import augmenters as iaa
 import numpy as np
 import base64
+import tempfile
+
+
 
 task_complete = False
 
@@ -122,30 +131,96 @@ def gallery(request):
     context = {'page':'Gallery', 'categories': categories, 'photos': photos, 'user': request.user}
     return render(request, 'photos/gallery.html', context)
 
-def viewPhoto(request, pk):
-    augmentedPhotos=[]
-    photo = Photo.objects.get(id=pk)
+def download(request):
+    filename = request.GET.get('filename')
+    if filename:
+        # Return a FileResponse containing the contents of the temporary file
+        return FileResponse(open(filename, 'rb'), as_attachment=True, filename='dataset.zip')
+    return HttpResponseBadRequest()
+
+def zip_folder_thread(queue, folder_path):
+    time.sleep(5)
+    zip_file = tempfile.NamedTemporaryFile(delete=False)
+    name=zip_file.name
+    with ZipFile(zip_file, 'w') as zip_file:
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                zip_file.write(file_path, os.path.relpath(file_path, folder_path))
     
+    zip_file.close()
+    queue.put(name)
+
+
+def viewPhoto(request, pk):
+    context={'user': request.user}
     if request.method == 'POST':
-        photourl=os.path.normpath("..\\static"+photo.image.url)
-        print(photourl)
-        url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
-        img = cv.imread(url)
-        seq = iaa.Sequential([
-            iaa.TranslateX(percent=(-0.2, 0.2)),
-            iaa.ShearX((-20, 20)),
-            iaa.ShearY((-20, 20))
-        ])
-        images=np.array([img, img, img])
-        photos=seq(images=images)
-        for photo in photos:
-            jpgphoto = cv.imencode('.jpg', photo)[1]
-            encoded=str(base64.b64encode(jpgphoto), "utf-8")
-            augmentedPhotos.append(encoded)
-
-
-    context = {'photo': photo, 'augmentedPhotos': augmentedPhotos}
+        
+        queue = Queue()
+        folder_path = request.POST.get('folder_path')
+        print(folder_path)
+        if folder_path:
+            # Start the zip process in a new thread
+            thread = threading.Thread(target=zip_folder_thread, args=(queue, folder_path,))
+            thread.start()
+            # Return a JSON response containing the URL to the temporary file
+            filename=queue.get()
+            print(filename)
+            return JsonResponse({'url': filename})
     return render(request, 'photos/photo.html', context)
+    
+    # folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test')
+    # if not os.path.exists(folder_path):
+    #     return HttpResponse('Folder not found')
+
+    # file_name = 'my_folder.zip'
+    # zip_buffer = BytesIO()
+
+    # with ZipFile(zip_buffer, 'w') as zip_file:
+    #     for root, dirs, files in os.walk(folder_path):
+    #         for file in files:
+    #             file_path = os.path.join(root, file)
+    #             zip_file.write(file_path, os.path.relpath(file_path, folder_path))
+
+    # zip_buffer.seek(0)
+    # # Get the size of the zip file
+    # zip_size = zip_buffer.getbuffer().nbytes
+
+    # # Create an HTTP response with the zip file as an attachment
+    # response = HttpResponse(zip_buffer, content_type='application/zip')
+    # response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
+
+    # # Set the Content-Length header based on the size of the zip file
+    # response['Content-Length'] = str(zip_size)
+    
+    
+    # print("here")
+    # # Return the HTTP response to the user
+    # return response
+
+    #old photo
+    #augmentedPhotos=[]
+    #photo = Photo.objects.get(id=pk)
+    # if request.method == 'POST':
+    #     photourl=os.path.normpath("..\\static"+photo.image.url)
+    #     print(photourl)
+    #     url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
+    #     img = cv.imread(url)
+    #     seq = iaa.Sequential([
+    #         iaa.TranslateX(percent=(-0.2, 0.2)),
+    #         iaa.ShearX((-20, 20)),
+    #         iaa.ShearY((-20, 20))
+    #     ])
+    #     images=np.array([img, img, img])
+    #     photos=seq(images=images)
+    #     for photo in photos:
+    #         jpgphoto = cv.imencode('.jpg', photo)[1]
+    #         encoded=str(base64.b64encode(jpgphoto), "utf-8")
+    #         augmentedPhotos.append(encoded)
+
+
+    # context = {'photo': photo, 'augmentedPhotos': augmentedPhotos}
+    # return render(request, 'photos/photo.html', context)
 
 def addPhoto(request):
     categories = Category.objects.all

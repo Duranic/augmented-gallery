@@ -7,7 +7,31 @@
     <title>Photo {{ key }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+    $(document).ready(function() {
+        $('#download-button').click(function() {
+        // Make an AJAX request to the server to create the zip file
+        $.ajax({
+            url: '/photo/1/',
+            type: 'POST',
+            data: {
+                'folder_path': 'C:/Users/Dominik/Desktop/Diplomski/augmented-gallery/photos/'+'{{user}}',// use django {{path}} later
+                csrfmiddlewaretoken: '{{ csrf_token }}'}, 
+            success: function(data) {
+            // Redirect the user to the download URL
+            window.location.href = '/download?filename=' + data.url;
+            },
+            error: function(xhr, status, error) {
+            console.log('Error:', error);
+            }
+        });
+        });
+    });
+    </script>
+
+    <!-- <script>
         $(document).ready(function(){
         $('#loading-message').show();
         $('#processed-image').hide();
@@ -27,7 +51,7 @@
             }
         });
         });
-    </script>
+    </script> -->
 </head>
 
 <body class="m-5">
@@ -41,6 +65,9 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
                 <img id="processed-image" src="" alt="Processed Image">
+
+                <button id="download-button">Download</button>
+
                 
             </div>
         </div>
