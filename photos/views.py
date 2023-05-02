@@ -15,7 +15,7 @@ from queue import Queue
 import threading
 import time
 import cv2 as cv
-import os
+import os, shutil, errno
 from imgaug import augmenters as iaa
 import numpy as np
 import base64
@@ -97,6 +97,17 @@ def registerPage(request):
         form = CreateUserForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Creating a folder for each registered user
+            new_dir_path = os.path.join(settings.PROJECT_ROOT,'..', 'dynamic', request.POST.get('username'))
+            try:
+                os.mkdir(new_dir_path)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    #directory already exists
+                    pass
+                else:
+                    print(e)
 
     context={'form':form}
 
@@ -154,11 +165,11 @@ def zip_folder_thread(queue, folder_path):
 
 
 def viewPhoto(request, pk):
-    context={'user': request.user}
+    context = {'page':'augment'}
     if request.method == 'POST':
         
         queue = Queue()
-        folder_path = request.POST.get('folder_path')
+        folder_path = os.path.normpath(os.path.join(settings.PROJECT_ROOT, "..", "dynamic/",request.user.username))
         print(folder_path)
         if folder_path:
             # Start the zip process in a new thread

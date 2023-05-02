@@ -44,6 +44,7 @@
               </li>
               {% endif %}
           </ul>
+          {{user}}
           {% if user != None and user != 'AnonymousUser' %}
           <a href="{% url 'logout' %}" class="btn btn-light mx-2" >Log out</a>
           {% else %}
