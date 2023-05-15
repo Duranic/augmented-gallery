@@ -26,14 +26,14 @@
             
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item">
-              <a class="nav-link {% if page == 'home' %}active{% endif %}" aria-current="page" href="{% url 'gallery' %}">Home</a>
+              <a class="nav-link {% if page == 'Home' %}active{% endif %}" aria-current="page" href="{% url 'gallery' %}">Home</a>
               </li>
-              {% if user != None %}
+              {% if user.is_authenticated %}
               <li class="nav-item">
-              <a class="nav-link {% if page == 'add' %}active{% endif %} " href="{% url 'add' %}">Upload dataset</a>
+              <a class="nav-link {% if page == 'Upload' %}active{% endif %} " href="{% url 'add' %}">Upload dataset</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link {% if page == 'augment' %}active{% endif %}" href="{% url 'augment' %}">Augment</a>
+              <a class="nav-link {% if page == 'Augment' %}active{% endif %}" href="{% url 'augment' %}">Augment</a>
               </li>
               {% else %}
               <li class="nav-item">
@@ -45,7 +45,7 @@
               {% endif %}
           </ul>
           {{user}}
-          {% if user != None and user != 'AnonymousUser' %}
+          {% if user.is_authenticated %}
           <a href="{% url 'logout' %}" class="btn btn-light mx-2" >Log out</a>
           {% else %}
           <a href="{% url 'login' %}" class="btn btn-light mx-2" >Log in</a>

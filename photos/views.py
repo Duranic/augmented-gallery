@@ -31,13 +31,13 @@ def selectAugmentations(request):
         premade=request.POST.getlist('premade')
         
     
-        context = {'page':'augment', 'augmentations': augmentations}
+        context = {'page':'Augment', 'augmentations': augmentations}
         return render(request, 'photos/photo.html', context)
-    context = {'page':'augment'}
+    context = {'page':'Augment'}
     return render(request, "photos/augment.html", context)
 
 def augment(request):
-    time.sleep(5)
+    time.sleep(1)
 
     # clean up the string from ajax
     augmentations=unescape(request.POST.getlist('augmentations')[0])
@@ -109,7 +109,7 @@ def registerPage(request):
                 else:
                     print(e)
 
-    context={'form':form}
+    context={'page':'Register','form':form}
 
     return render(request, "photos/register.html", context)
 
@@ -123,7 +123,7 @@ def loginPage(request):
             login(request, user)
             return redirect("gallery")
 
-    context={}
+    context={'page':'Login'}
     return render(request, "photos/login.html", context)
 
 def logoutUser(request):
@@ -132,7 +132,7 @@ def logoutUser(request):
 
 def gallery(request):
     if request.user.is_authenticated==False:
-        context = {'page':'home', 'categories': None, 'photos': None, 'user': None}
+        context = {'page':'Home', 'categories': None, 'photos': None, 'user': None}
         return render(request, 'photos/gallery.html', context)
     category = request.GET.get('category')
     categories = Category.objects.all
@@ -140,7 +140,7 @@ def gallery(request):
         photos = Photo.objects.all
     else:
         photos=Photo.objects.filter(category__name=category)
-    context = {'page':'home', 'categories': categories, 'photos': photos, 'user': request.user}
+    context = {'page':'Home', 'categories': categories, 'photos': photos, 'user': request.user}
     return render(request, 'photos/gallery.html', context)
 
 def download(request):
@@ -151,7 +151,7 @@ def download(request):
     return HttpResponseBadRequest()
 
 def zip_folder_thread(queue, folder_path):
-    time.sleep(5)
+    time.sleep(1)
     zip_file = tempfile.NamedTemporaryFile(delete=False)
     name=zip_file.name
     with ZipFile(zip_file, 'w') as zip_file:
@@ -165,7 +165,7 @@ def zip_folder_thread(queue, folder_path):
 
 
 def viewPhoto(request, pk):
-    context = {'page':'augment'}
+    context = {'page':'Augment'}
     if request.method == 'POST':
         
         queue = Queue()
@@ -258,5 +258,5 @@ def addPhoto(request):
         
         return redirect('gallery')
 
-    context = {'page':'add', 'categories' : categories}
+    context = {'page':'Upload', 'categories' : categories}
     return render(request, 'photos/add.html', context)

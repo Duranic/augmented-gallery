@@ -1,16 +1,22 @@
 {% extends 'main.html' %}
 
+{% load static %}
 
+{% block title %} {{ page }} {% endblock title %}
 
 
 {% block content %}
-<h1>Register</h1>
+<div class="m-5">
+    <div class="container">
+        <h1>Register</h1>
 
-<form method="post" action="">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" name="Create User">
-</form>
+        <form method="post" action="">
+            {% csrf_token %}
+            {{form.as_p}}
+            <input type="submit" name="Create User">
+        </form>
+    </div>
+</div>
 
 
 {% endblock content %}
