@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.conf import settings
 from .models import Category, Photo
+from django import forms
 from .forms import CreateUserForm
 from django.http import JsonResponse, FileResponse
 from html import unescape
@@ -12,6 +13,7 @@ from django.core.files.base import ContentFile
 from zipfile import ZipFile
 from io import BytesIO
 from queue import Queue
+import glob
 import threading
 import time
 import cv2 as cv
@@ -20,6 +22,9 @@ from imgaug import augmenters as iaa
 import numpy as np
 import base64
 import tempfile
+
+class FolderUploadForm(forms.Form):
+    folder = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True, 'webkitdirectory': True, 'directory': True}))
 
 
 
@@ -235,28 +240,65 @@ def viewPhoto(request, pk):
     # return render(request, 'photos/photo.html', context)
 
 def addPhoto(request):
-    categories = Category.objects.all
-
+    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/",request.user.username)
+    context = {'page':'add'}
     if request.method == 'POST':
-        data = request.POST
-        images =  request.FILES.getlist('images')
-        print(images)
-        
-        if data['category'] != 'null':
-            category = Category.objects.get(id=data['category'])
-        elif data['category-new'] != '':
-            category, created = Category.objects.get_or_create(name = data['category-new'])
-        else:
-            category = None
-        
-        for image in images:
-            photo=Photo.objects.create(
-                category=category,
-                description=data['description'],
-                image=image
-            )
-        
-        return redirect('gallery')
+        files = request.FILES.getlist('file')
+        for file in files:
+            print(file)
+            file_path = os.path.join(user_path, file.name)
+            with open(file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
 
-    context = {'page':'add', 'categories' : categories}
+        context = {'page':'success'}
+        return render(request, 'photos/add.html', context)
+    
+    if(os.listdir(user_path)):
+        context['hasDataset']=True
+    
     return render(request, 'photos/add.html', context)
+
+    
+    
+
+
+
+    # WIP
+    # if request.method == 'POST':
+    #     form = request.POST
+    #     directory_name = form['dir_name']
+    #     print(directory_name)
+    #     # os.mkdir(os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", directory_name))
+    #     files =  request.FILES.getlist('images')
+    #     print(files)
+    # context = {'page':'add'}
+    # return render(request, 'photos/add.html', context)
+
+
+
+    # categories = Category.objects.all
+
+    # if request.method == 'POST':
+    #     data = request.POST
+    #     images =  request.FILES.getlist('images')
+    #     print(images)
+        
+    #     if data['category'] != 'null':
+    #         category = Category.objects.get(id=data['category'])
+    #     elif data['category-new'] != '':
+    #         category, created = Category.objects.get_or_create(name = data['category-new'])
+    #     else:
+    #         category = None
+        
+    #     for image in images:
+    #         photo=Photo.objects.create(
+    #             category=category,
+    #             description=data['description'],
+    #             image=image
+    #         )
+        
+    #     return redirect('gallery')
+
+    # context = {'page':'add', 'categories' : categories}
+    # return render(request, 'photos/add.html', context)

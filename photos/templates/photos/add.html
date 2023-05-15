@@ -9,7 +9,23 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-4">
-                    <a href="{% url 'gallery' %}" class="btn btn-outline-dark m-1">Go back</a>
+                    {% if hasDataset %}
+                        <div>
+                            you already have dataset
+                        </div>
+                    {% endif %}
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" name="file" multiple webkitdirectory directory>
+                        <button type="submit">Upload</button>
+                    </form>
+
+                    <!--WIP <form>
+                        <input type="hidden" name="dir_name" id="id_dir_name">
+                        <input type="file" name="file" onchange="selectFolder(event)" webkitdirectory="" multiple="" required="" directory="" id="id_file">
+                        <button type="submit" class="btn btn-primary m-3">Submit</button>
+                    </form> -->
+                    <!-- OLD <a href="{% url 'gallery' %}" class="btn btn-outline-dark m-1">Go back</a>
                     <div class="card">
 
                         <form method="POST" action="" enctype="multipart/form-data">
@@ -43,9 +59,17 @@
                             <button type="submit" class="btn btn-primary m-3">Submit</button>
 
                         </form>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        function selectFolder(e) {
+            var theFiles = e.target.files;
+            var relativePath = theFiles[0].webkitRelativePath;
+            var folder = relativePath.split("/");
+            $("#id_dir_name").val(folder[0]);
+        }
+    </script>
 {% endblock content %}
