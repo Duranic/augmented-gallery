@@ -240,18 +240,32 @@ def viewPhoto(request, pk):
     # return render(request, 'photos/photo.html', context)
 
 def addPhoto(request):
-    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/",request.user.username)
-    context = {'page':'add'}
+    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
+    context = {'page':'Upload'}
     if request.method == 'POST':
-        files = request.FILES.getlist('file')
-        for file in files:
-            print(file)
-            file_path = os.path.join(user_path, file.name)
-            with open(file_path, 'wb+') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
+        if (request.user.is_authenticated):
+            if(os.listdir(user_path)):
+                # deletes existing dataset
+                shutil.rmtree(user_path)
+                # creates the folder again
+                try:
+                        os.mkdir(user_path)
+                except OSError as e:
+                    if e.errno != errno.EEXIST:
+                        #directory already exists
+                        pass
+                    else:
+                        print(e)
 
-        context = {'page':'success'}
+            files = request.FILES.getlist('file')
+            for file in files:
+                print(file)
+                file_path = os.path.join(user_path, file.name)
+                with open(file_path, 'wb+') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+            
+            context['hasDataset']=True
         return render(request, 'photos/add.html', context)
     
     if(os.listdir(user_path)):

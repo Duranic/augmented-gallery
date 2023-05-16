@@ -5,19 +5,33 @@
 {% block title %} {{ page }} {% endblock title %}
 
 {% block content %}
+    <style>
+        img {
+            height: 20px;
+        }
+        .warning{
+            background-color: lightgoldenrodyellow;
+        }
+    </style>
     <div class="m-5">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     {% if hasDataset %}
-                        <div>
-                            you already have dataset
-                        </div>
+                    <div class="warning mb-3">
+                        <img class="float-left" src="../../static/images/warning.png" alt="Dataset warning">
+                        You already have an uploaded dataset. Uploading a new dataset will delete the existing dataset.
+                    </div>
                     {% endif %}
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input type="file" name="file" multiple webkitdirectory directory>
-                        <button type="submit">Upload</button>
+                        <div class="form-group">
+                            <div class="mb-3">
+                                <label for="formFile" class="form-label">Select your dataset folder</label>
+                                <input class="form-control" type="file" name="file" multiple webkitdirectory directory>
+                            </div>
+                        </div>
+                        <button class="btn btn-dark m-1" type="submit">Upload</button>
                     </form>
 
                     <!--WIP <form>
@@ -64,12 +78,12 @@
             </div>
         </div>
     </div>
-    <script>
+    <!-- <script>
         function selectFolder(e) {
             var theFiles = e.target.files;
             var relativePath = theFiles[0].webkitRelativePath;
             var folder = relativePath.split("/");
             $("#id_dir_name").val(folder[0]);
         }
-    </script>
+    </script> -->
 {% endblock content %}
