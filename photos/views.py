@@ -23,8 +23,7 @@ import numpy as np
 import base64
 import tempfile
 
-class FolderUploadForm(forms.Form):
-    folder = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True, 'webkitdirectory': True, 'directory': True}))
+
 
 
 
@@ -239,10 +238,16 @@ def viewPhoto(request, pk):
     # context = {'photo': photo, 'augmentedPhotos': augmentedPhotos}
     # return render(request, 'photos/photo.html', context)
 
+def unzip_file(zip_file_path, extract_dir):
+    with ZipFile(zip_file_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_dir)
+
+
+
 def addPhoto(request):
     user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
     context = {'page':'Upload'}
-    if request.method == 'POST':
+    if request.method == 'POST' and request.FILES.get('zip_file'):
         if (request.user.is_authenticated):
             if(os.listdir(user_path)):
                 # deletes existing dataset
@@ -256,15 +261,13 @@ def addPhoto(request):
                         pass
                     else:
                         print(e)
-
-            files = request.FILES.getlist('file')
-            for file in files:
-                print(file)
-                file_path = os.path.join(user_path, file.name)
-                with open(file_path, 'wb+') as destination:
-                    for chunk in file.chunks():
-                        destination.write(chunk)
             
+            zip_file = request.FILES['zip_file']
+            with ZipFile(zip_file, 'r') as zip_ref:
+                zip_ref.extractall(user_path)
+
+            
+
             context['hasDataset']=True
         return render(request, 'photos/add.html', context)
     
