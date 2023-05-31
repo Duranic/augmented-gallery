@@ -268,7 +268,7 @@ def addPhoto(request):
 
             
 
-            context['hasDataset']=True
+            context['success']=True
         return render(request, 'photos/add.html', context)
     
     if(os.listdir(user_path)):

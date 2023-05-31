@@ -50,7 +50,8 @@
                     url: '/photo/1/',
                     type: 'POST',
                     data: {
-                        csrfmiddlewaretoken: '{{ csrf_token }}'}, 
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    }, 
                     success: function(data) {
                         // Redirect the user to the download URL
                         window.location.href = '/download?filename=' + data.url;

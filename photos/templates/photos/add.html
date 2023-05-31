@@ -12,23 +12,52 @@
         .warning{
             background-color: lightgoldenrodyellow;
         }
+        .success{
+            background-color: lightblue;
+        }
+
+
+        .custom-file-button input[type=file] {
+            margin-left: -2px !important;
+        }
+
+        .custom-file-button input[type=file]::-webkit-file-upload-button {
+            display: none;
+        }
+
+        .custom-file-button input[type=file]::file-selector-button {
+            display: none;
+        }
+
+        .custom-file-button:hover label {
+            background-color: #dde0e3;
+            cursor: pointer;
+        }
     </style>
     <div class="m-5">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    {% if hasDataset %}
+                    {% if success %}
+                    <div class="success mb-3">
+                        Successfully uploaded the dataset!
+                    </div>
+                    {% elif hasDataset %} 
                     <div class="warning mb-3">
                         <img class="float-left" src="../../static/images/warning.png" alt="Dataset warning">
                         You already have an uploaded dataset. Uploading a new dataset will delete the existing dataset.
                     </div>
                     {% endif %}
-                    <form method="post" enctype="multipart/form-data">
+                    <h2>Upload new dataset</h2>
+                    <form method="post" enctype="multipart/form-data"  onsubmit="return validateFile();">
                         {% csrf_token %}
                         <div class="form-group">
                             <div class="mb-3">
-                                <label for="formFile" class="form-label">Select your zipped dataset</label>
-                                <input class="form-control" type="file" name="zip_file">
+                                <label class="form-label" for="zip_file">Select your zipped dataset</label>
+                                <div class="input-group custom-file-button">
+                                    <label class="input-group-text" for="zip_file">Choose .zip file</label>
+                                    <input class="form-control" type="file" name="zip_file" id="zip_file" placeholder="Select .zip file">
+                                </div>
                             </div>
                         </div>
                         <button class="btn btn-dark m-1" type="submit">Upload</button>
@@ -78,12 +107,21 @@
             </div>
         </div>
     </div>
-    <!-- <script>
-        function selectFolder(e) {
-            var theFiles = e.target.files;
-            var relativePath = theFiles[0].webkitRelativePath;
-            var folder = relativePath.split("/");
-            $("#id_dir_name").val(folder[0]);
+    <script>
+        function validateFile() {
+            var fileInput = document.getElementById('zip_file');
+            var file = fileInput.files[0];
+            var fileType = file.type;
+            console.log(fileType)
+            
+            if (fileType !== 'application/zip' && fileType !== 'application/x-zip-compressed') {
+                alert('Please select a ZIP file.');
+                return false;
+            }
+            else{
+                return true;
+            }
+             
         }
-    </script> -->
+    </script>
 {% endblock content %}
