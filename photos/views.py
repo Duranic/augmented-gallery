@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from zipfile import ZipFile
 from io import BytesIO
 from queue import Queue
+from PIL import Image
 import glob
 import threading
 import time
@@ -92,6 +93,25 @@ def augment(request):
         jpgphoto = cv.imencode('.jpg', photo)[1]
         encoded=str(base64.b64encode(jpgphoto), "utf-8")
         augmentedPhotos.append(encoded)
+
+    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
+    for subdir, dirs, files in os.walk(user_path):
+        for file in files:
+            # Create the full file path
+            file_path = os.path.join(subdir, file)
+
+            # Check if the file is an image (optional)
+            if file.endswith('.jpg') or file.endswith('.png'):
+                # Open the image using PIL
+                image =np.array( Image.open(file_path))
+                
+
+                # Apply the augmentations
+                augmented_image = seq.augment_image(image)
+                augmented_image_pil = Image.fromarray(augmented_image)
+                # Save the augmented image in the same directory
+                augmented_file_path = os.path.join(subdir, f"augmented_{file}")
+                augmented_image_pil.save(augmented_file_path, format='PNG')
     return JsonResponse({'url': augmentedPhotos[0]})
 
 def registerPage(request):
