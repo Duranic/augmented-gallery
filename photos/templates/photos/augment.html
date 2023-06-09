@@ -154,7 +154,12 @@
             </div>
             <div class="col-sm-5">
                 <h2 id="mouseover">Mouseover for a preview</h2>
-                <img alt="preview image" class="img-fluid" id="img">
+                
+                {% for item in list %}
+                    {% with "preview"|add:item|add:".png" as url %}
+                    <img alt="preview image" class="img-fluid" id="img{{ forloop.counter0 }}" src="{% static url %}">
+                    {% endwith %}
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -162,13 +167,13 @@
 
     <script>
         
-        $("#img").hide();
-        var imgArray = new Array();
-        var i;
-        for(i=0;i<9;i++){
-            imgArray[i] = new Image();
-            imgArray[i].src = '../../static/images/preview'+ i +'.png';
-        }
+        // $("#img").hide();
+        // var imgArray = new Array();
+        // var i;
+        // for(i=0;i<9;i++){
+        //     imgArray[i] = new Image();
+        //     imgArray[i].src = '../../static/images/preview'+ i +'.png';
+        // }
 
         function mouseover(index){
             $("#mouseover").hide();
