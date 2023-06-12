@@ -64,11 +64,12 @@ def augment(request):
             case 'translatey':
                 augmenters.append(iaa.TranslateY(percent=(-0.2, 0.2)))
                 print(augmentation)
+            # iaa.Crop(percent=(0, 0.2))
             case 'shearx':
-                augmenters.append(iaa.ShearX((-20, 20)))
+                augmenters.append(iaa.ShearX((-20, 20))) #degrees
                 print(augmentation)
             case 'sheary':
-                augmenters.append(iaa.ShearY((-20, 20)))
+                augmenters.append(iaa.ShearY((-20, 20))) #degrees
                 print(augmentation)
             case 'flipx':
                 augmenters.append(iaa.Fliplr(0.5))
