@@ -44,7 +44,8 @@
                     </div>
                     {% elif hasDataset %} 
                     <div class="warning mb-3">
-                        <img class="float-left" src="../../static/images/warning.png" alt="Dataset warning">
+                        <!-- <img class="float-left" src="../../static/images/warning.png" alt="Dataset warning"> -->
+                        <img class="float-left" src="{% static 'warning.png' %}" alt="Dataset warning">
                         You already have an uploaded dataset. Uploading a new dataset will delete the existing dataset.
                     </div>
                     {% endif %}

@@ -35,10 +35,11 @@ def selectAugmentations(request):
         augmentations=request.POST.getlist('augmentations')
         premade=request.POST.getlist('premade')
         
-    
+        
         context = {'page':'Augment', 'augmentations': augmentations}
         return render(request, 'photos/photo.html', context)
-    context = {'page':'Augment'}
+    items = ["0","1","2","3","4","5","6","7","8"]
+    context = {'page':'Augment', 'list':items}
     return render(request, "photos/augment.html", context)
 
 def augment(request):
