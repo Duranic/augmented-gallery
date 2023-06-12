@@ -36,6 +36,7 @@
             url: '{% url "process_image" %}',
             data : {
                 augmentations : '{{ augmentations }}',
+                premade : '{{ premade }}',
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function(data) {
@@ -47,7 +48,7 @@
                 $('#download-message').show();
                 // Make an AJAX request to the server to create the zip file
                 $.ajax({
-                    url: '/photo/1/',
+                    url: '/photo/',
                     type: 'POST',
                     data: {
                         csrfmiddlewaretoken: '{{ csrf_token }}'

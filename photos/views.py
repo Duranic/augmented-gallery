@@ -34,9 +34,11 @@ def selectAugmentations(request):
     if(request.method=="POST"):
         augmentations=request.POST.getlist('augmentations')
         premade=request.POST.getlist('premade')
-        
-        
-        context = {'page':'Augment', 'augmentations': augmentations}
+        if(premade):
+            premade=True
+        else:
+            premade=False
+        context = {'page':'Augment', 'augmentations': augmentations, 'premade':premade}
         return render(request, 'photos/photo.html', context)
     items = ["0","1","2","3","4","5","6","7","8"]
     context = {'page':'Augment', 'list':items}
@@ -44,45 +46,48 @@ def selectAugmentations(request):
 
 def augment(request):
     time.sleep(1)
-
+    premade=request.POST.getlist('premade')[0]
     # clean up the string from ajax
     augmentations=unescape(request.POST.getlist('augmentations')[0])
     # evaluate the string as list
     augmentations=literal_eval(augmentations)
+    print(augmentations)
     augmenters=[]
-
-    for augmentation in augmentations:
-        match (augmentation):
-            case 'solarize':
-                augmenters.append(iaa.Solarize(0.5, threshold=(32, 128)))
-                print(augmentation)
-            case 'posterize':
-                augmenters.append(iaa.Posterize(2))
-                print(augmentation)
-            case 'translatex':
-                augmenters.append(iaa.TranslateX(percent=(-0.2, 0.2)))
-                print(augmentation)
-            case 'translatey':
-                augmenters.append(iaa.TranslateY(percent=(-0.2, 0.2)))
-                print(augmentation)
-            # iaa.Crop(percent=(0, 0.2))
-            case 'shearx':
-                augmenters.append(iaa.ShearX((-20, 20))) #degrees
-                print(augmentation)
-            case 'sheary':
-                augmenters.append(iaa.ShearY((-20, 20))) #degrees
-                print(augmentation)
-            case 'flipx':
-                augmenters.append(iaa.Fliplr(0.5))
-                print(augmentation)
-            case 'flipy':
-                augmenters.append(iaa.Flipud(0.5))
-                print(augmentation)
-            case 'rotate':
-                augmenters.append(iaa.Affine(rotate=(-45, 45)))
-                print(augmentation)
-            case _:
-                print("illegal state")
+    if(premade=="True"):
+        augmenters.append(iaa.RandAugment(n=2, m=9))
+    else:
+        for augmentation in augmentations:
+            match (augmentation):
+                case 'solarize':
+                    augmenters.append(iaa.Solarize(0.5, threshold=(32, 128)))
+                    print(augmentation)
+                case 'posterize':
+                    augmenters.append(iaa.Posterize(2))
+                    print(augmentation)
+                case 'translatex':
+                    augmenters.append(iaa.TranslateX(percent=(-0.2, 0.2)))
+                    print(augmentation)
+                case 'translatey':
+                    augmenters.append(iaa.TranslateY(percent=(-0.2, 0.2)))
+                    print(augmentation)
+                # iaa.Crop(percent=(0, 0.2))
+                case 'shearx':
+                    augmenters.append(iaa.ShearX((-20, 20))) #degrees
+                    print(augmentation)
+                case 'sheary':
+                    augmenters.append(iaa.ShearY((-20, 20))) #degrees
+                    print(augmentation)
+                case 'flipx':
+                    augmenters.append(iaa.Fliplr(0.5))
+                    print(augmentation)
+                case 'flipy':
+                    augmenters.append(iaa.Flipud(0.5))
+                    print(augmentation)
+                case 'rotate':
+                    augmenters.append(iaa.Affine(rotate=(-45, 45)))
+                    print(augmentation)
+                case _:
+                    print("illegal state")
 
     augmentedPhotos=[]
     photourl=os.path.normpath("..\\static"+"\\images\\tree_FD89IFe.jpg")
@@ -190,7 +195,7 @@ def zip_folder_thread(queue, folder_path):
     queue.put(name)
 
 
-def viewPhoto(request, pk):
+def viewPhoto(request):
     context = {'page':'Augment'}
     if request.method == 'POST':
         
