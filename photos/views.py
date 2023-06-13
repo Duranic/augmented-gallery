@@ -31,6 +31,7 @@ import tempfile
 task_complete = False
 
 def selectAugmentations(request):
+    context = {'page':'Augment'}
     if(request.method=="POST"):
         augmentations=request.POST.getlist('augmentations')
         premade=request.POST.getlist('premade')
@@ -40,12 +41,17 @@ def selectAugmentations(request):
             premade=False
         context = {'page':'Augment', 'augmentations': augmentations, 'premade':premade}
         return render(request, 'photos/photo.html', context)
+    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
+
+    if( not(os.listdir(user_path))):
+        print("is empty")
+        context['hasDataset']=False
+
     items = ["0","1","2","3","4","5","6","7","8"]
-    context = {'page':'Augment', 'list':items}
+    context['list']=items
     return render(request, "photos/augment.html", context)
 
 def augment(request):
-    time.sleep(1)
     premade=request.POST.getlist('premade')[0]
     # clean up the string from ajax
     augmentations=unescape(request.POST.getlist('augmentations')[0])
@@ -54,7 +60,7 @@ def augment(request):
     print(augmentations)
     augmenters=[]
     if(premade=="True"):
-        augmenters.append(iaa.RandAugment(n=2, m=9))
+        augmenters.append(iaa.RandAugment(n=1, m=9))
     else:
         for augmentation in augmentations:
             match (augmentation):
