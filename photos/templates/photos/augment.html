@@ -67,6 +67,34 @@
                                                             Posterize
                                                             </label>
                                                         </div>
+                                                        <div class="container">
+                                                            <div class="row">
+                                                              <div class="col-auto align-self-center">
+                                                                <div class="form-check">
+                                                                  <input class="form-check-input" type="checkbox" id="showFields">
+                                                                  <label class="form-check-label" for="showFields">Show Fields</label>
+                                                                </div>
+                                                              </div>
+                                                              <div class="col">
+                                                                <div id="fieldsContainer" style="visibility: hidden;">
+                                                                  <div class="row g-2">
+                                                                    <div class="col">
+                                                                        <div class="input-group">
+                                                                            <label for="field1" class="input-group-text">Field 1:</label>
+                                                                            <input type="number" class="form-control" id="field1" min="0">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <div class="input-group">
+                                                                            <label for="field2" class="input-group-text">Field 2:</label>
+                                                                            <input type="number" class="form-control" id="field2" min="0">
+                                                                          </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                          </div>
                                                     </div>
                                                 </div>
                                             </li>
@@ -119,6 +147,10 @@
                                                             Flip vertical
                                                             </label>
                                                         </div>
+                                                        <div class="form-outline">
+                                                            <input type="number" step="1" id="typeNumber" class="form-control" />
+                                                            <label class="form-label" for="typeNumber">Number input</label>
+                                                        </div>
                                                         <div class="form-check" id="8" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
                                                             <input name="augmentations" class="form-check-input" type="checkbox" value="rotate" id="custom8">
                                                             <label class="form-check-label" for="custom8">
@@ -168,6 +200,19 @@
             </div>
         </div>
     </div>
+
+    
+      <script>
+        $(document).ready(function() {
+          $('#showFields').change(function() {
+            if (this.checked) {
+              $('#fieldsContainer').css('visibility','visible');
+            } else {
+              $('#fieldsContainer').css('visibility','hidden');
+            }
+          });
+        });
+      </script>
     
 
     <script>
