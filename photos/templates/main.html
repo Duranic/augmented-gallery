@@ -44,9 +44,10 @@
               </li>
               {% endif %}
           </ul>
-          <div class="text-light">Hello {{user}}</div>
+          
           
           {% if user.is_authenticated %}
+          <div class="text-light">Hello {{user}}</div>
           <a href="{% url 'logout' %}" class="btn btn-light mx-2" >Log out</a>
           {% else %}
           <a href="{% url 'login' %}" class="btn btn-light mx-2" >Log in</a>
