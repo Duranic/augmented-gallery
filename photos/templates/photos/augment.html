@@ -55,46 +55,74 @@
                                                 <a class="links" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapseExample">Color augmentations</a>
                                                 <div class="collapse" id="collapse1">
                                                     <div class="m-3" >
-                                                        <div class="form-check" id="0" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                        <!-- <div class="form-check" id="0" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
                                                             <input name="augmentations" class="form-check-input" type="checkbox" value="solarize" id="custom0">
                                                             <label class="form-check-label" for="custom0">
                                                             Solarize
                                                             </label>
-                                                        </div>
-                                                        <div class="form-check" id="1" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                        </div> -->
+                                                        <!-- <div class="form-check" id="1" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
                                                             <input name="augmentations" class="form-check-input" type="checkbox" value="posterize" id="custom1">
                                                             <label class="form-check-label" for="custom1">
                                                             Posterize
                                                             </label>
-                                                        </div>
-                                                        <div class="container">
+                                                        </div> -->
+                                                        <div class="container mt-3">
                                                             <div class="row">
-                                                              <div class="col-auto align-self-center">
-                                                                <div class="form-check">
-                                                                  <input class="form-check-input" type="checkbox" id="showFields">
-                                                                  <label class="form-check-label" for="showFields">Show Fields</label>
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="0" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="solarize" class="form-check-input" type="checkbox" id="custom0">
+                                                                    <label class="form-check-label" for="custom0">Solarize</label>
+                                                                    </div>
                                                                 </div>
-                                                              </div>
-                                                              <div class="col">
-                                                                <div id="fieldsContainer" style="visibility: hidden;">
-                                                                  <div class="row g-2">
-                                                                    <div class="col">
-                                                                        <div class="input-group">
-                                                                            <label for="field1" class="input-group-text">Field 1:</label>
-                                                                            <input type="number" class="form-control" id="field1" min="0">
+                                                                <div class="col">
+                                                                    <div id="range0" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min0" class="input-group-text">Min:</label>
+                                                                                    <input name="min0" type="number" class="form-control" id="min0" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max0" class="input-group-text">Max:</label>
+                                                                                    <input name="max0" type="number" class="form-control" id="max0" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                    <div class="col">
-                                                                        <div class="input-group">
-                                                                            <label for="field2" class="input-group-text">Field 2:</label>
-                                                                            <input type="number" class="form-control" id="field2" min="0">
-                                                                          </div>
-                                                                    </div>
-                                                                  </div>
                                                                 </div>
-                                                              </div>
                                                             </div>
-                                                          </div>
+                                                        </div>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="1" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="posterize" class="form-check-input" type="checkbox" id="custom1">
+                                                                    <label class="form-check-label" for="custom1">Posterize</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range1" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min1" class="input-group-text">Min:</label>
+                                                                                    <input name="min1" type="number" class="form-control" id="min1" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max1" class="input-group-text">Max:</label>
+                                                                                    <input name="max1" type="number" class="form-control" id="max1" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </li>
@@ -181,7 +209,9 @@
                                     </div>
                                 </div>
                             </div>
-                            
+                        <input type="range" value="1" min="1" max="15" oninput="this.nextElementSibling.innerHTML = this.value">
+                        <button>1</button>
+                        
                         </div>
                         <div class="p-1">
                             <button type="submit" class='btn btn-dark col-12'>Augment</button>
@@ -204,14 +234,22 @@
     
       <script>
         $(document).ready(function() {
-          $('#showFields').change(function() {
-            if (this.checked) {
-              $('#fieldsContainer').css('visibility','visible');
-            } else {
-              $('#fieldsContainer').css('visibility','hidden');
-            }
-          });
+            $('input:checkbox[id^="custom"]').change(function() {
+                if (this.checked) {
+                $('#range'+this.parentNode.id).css('visibility','visible');
+                } else {
+                $('#range'+this.parentNode.id).css('visibility','hidden');
+                }
+            });
+
+            document.getElementById('min0').addEventListener("keydown", function(event) {
+                if (event.key === "." || event.key === "Decimal") {
+                    event.preventDefault();
+                }
+            });
         });
+
+        
       </script>
     
 
