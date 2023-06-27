@@ -51,7 +51,7 @@
                                 <div id="flush-collapseOne" class="accordion-collapse collapse show" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                                     <div>
                                         <ul class="list-group list-group-flush">
-                                            <li class="list-group-item">
+                                            <li class="list-group-item mx-3">
                                                 <a class="links" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapseExample">Color augmentations</a>
                                                 <div class="collapse" id="collapse1">
                                                     <div class="m-3" >
@@ -128,62 +128,212 @@
                                             </li>
                                             
                                             
-                                            <li class="list-group-item">
+                                            <li class="list-group-item mx-3">
                                                 <a class="links" data-bs-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapseExample">Affine augmentations</a>
                                                 <div class="collapse" id="collapse2">
                                                     <div class="m-3" >
-                                                        <div class="form-check" id="2" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="translatex" id="custom2">
-                                                            <label class="form-check-label" for="custom2">
-                                                            Translate X
-                                                            </label>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="2" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="translatex" class="form-check-input" type="checkbox" id="custom2">
+                                                                    <label class="form-check-label" for="custom2">Translate X</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range2" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min2" class="input-group-text">Min:</label>
+                                                                                    <input name="min2" type="number" class="form-control" id="min2" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max2" class="input-group-text">Max:</label>
+                                                                                    <input name="max2" type="number" class="form-control" id="max2" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="form-check" id="3" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="translatey" id="custom3">
-                                                            <label class="form-check-label" for="custom3">
-                                                            Translate Y
-                                                            </label>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="3" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="translatey" class="form-check-input" type="checkbox" id="custom3">
+                                                                    <label class="form-check-label" for="custom3">Translate Y</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range3" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min3" class="input-group-text">Min:</label>
+                                                                                    <input name="min3" type="number" class="form-control" id="min3" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max3" class="input-group-text">Max:</label>
+                                                                                    <input name="max3" type="number" class="form-control" id="max3" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="form-check" id="4" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="shearx" id="custom4">
-                                                            <label class="form-check-label" for="custom4">
-                                                            Shear X
-                                                            </label>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="4" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="shearx" class="form-check-input" type="checkbox" id="custom4">
+                                                                    <label class="form-check-label" for="custom4">Shear X</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range4" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min4" class="input-group-text">Min:</label>
+                                                                                    <input name="min4" type="number" class="form-control" id="min4" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max4" class="input-group-text">Max:</label>
+                                                                                    <input name="max4" type="number" class="form-control" id="max4" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="form-check" id="5" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="sheary" id="custom5">
-                                                            <label class="form-check-label" for="custom5">
-                                                            Shear Y
-                                                            </label>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="5" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="sheary" class="form-check-input" type="checkbox" id="custom5">
+                                                                    <label class="form-check-label" for="custom5">Shear Y</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range5" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min5" class="input-group-text">Min:</label>
+                                                                                    <input name="min5" type="number" class="form-control" id="min5" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max5" class="input-group-text">Max:</label>
+                                                                                    <input name="max5" type="number" class="form-control" id="max5" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </li>
-                                            <li class="list-group-item">
+                                            <li class="list-group-item mx-3">
                                                 <a class="links" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapseExample">Flip and rotate augmentations</a>
                                                 <div class="collapse" id="collapse3">
                                                     <div class="m-3" >
-                                                        <div class="form-check" id="6" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="flipx" id="custom6">
-                                                            <label class="form-check-label" for="custom6">
-                                                            Flip horizontal
-                                                            </label>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="6" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="flipx" class="form-check-input" type="checkbox" id="custom6">
+                                                                    <label class="form-check-label" for="custom6">Flip horizontal</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range6" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min6" class="input-group-text">Min:</label>
+                                                                                    <input name="min6" type="number" class="form-control" id="min6" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max6" class="input-group-text">Max:</label>
+                                                                                    <input name="max6" type="number" class="form-control" id="max6" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="form-check" id="7" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="flipy" id="custom7">
-                                                            <label class="form-check-label" for="custom7">
-                                                            Flip vertical
-                                                            </label>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="7" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="flipy" class="form-check-input" type="checkbox" id="custom7">
+                                                                    <label class="form-check-label" for="custom7">Flip vertical</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range7" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min7" class="input-group-text">Min:</label>
+                                                                                    <input name="min7" type="number" class="form-control" id="min7" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max7" class="input-group-text">Max:</label>
+                                                                                    <input name="max7" type="number" class="form-control" id="max7" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="form-outline">
-                                                            <input type="number" step="1" id="typeNumber" class="form-control" />
-                                                            <label class="form-label" for="typeNumber">Number input</label>
-                                                        </div>
-                                                        <div class="form-check" id="8" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="rotate" id="custom8">
-                                                            <label class="form-check-label" for="custom8">
-                                                            Rotate
-                                                            </label>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-auto align-self-center">
+                                                                    <div class="form-check"  id="8" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="rotate" class="form-check-input" type="checkbox" id="custom8">
+                                                                    <label class="form-check-label" for="custom8">Rotate</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <div id="range8" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="min8" class="input-group-text">Min:</label>
+                                                                                    <input name="min8" type="number" class="form-control" id="min8" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col">
+                                                                                <div class="input-group">
+                                                                                    <label for="max8" class="input-group-text">Max:</label>
+                                                                                    <input name="max8" type="number" class="form-control" id="max8" min="0" max="100">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>

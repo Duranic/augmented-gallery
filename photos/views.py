@@ -39,7 +39,6 @@ def selectAugmentations(request):
         solarizeRange=[request.POST.get('min0'), request.POST.get('max0')]
         if(not solarizeRange[0] or not solarizeRange[1]):
             solarizeRange=[20, 40]
-        print(solarizeRange)
         solarizeRange=[int(each) for each in solarizeRange]
         print(solarizeRange)
         if(premade):
