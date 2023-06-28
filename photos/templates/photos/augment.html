@@ -24,6 +24,9 @@
             box-shadow: inherit;
         }
        
+        .input-group-text, input[type='number'] {
+            height: 30px;
+        }
 
     </style>
 
@@ -359,9 +362,13 @@
                                     </div>
                                 </div>
                             </div>
-                        <input type="range" value="1" min="1" max="15" oninput="this.nextElementSibling.innerHTML = this.value">
-                        <button>1</button>
-                        
+
+                            <div class="input-group p-3">
+                                <label for="imageRange" class="form-label">Select the number of augmented images:</label>
+                                <input id="imageRange" type="range" class="form-range" value="1" min="1" max="15" oninput="this.nextElementSibling.innerHTML = this.value">
+                                <button>1</button>
+                            </div>
+                            
                         </div>
                         <div class="p-1">
                             <button type="submit" class='btn btn-dark col-12'>Augment</button>
@@ -393,7 +400,7 @@
             });
 
             document.getElementById('min0').addEventListener("keydown", function(event) {
-                if (event.key === "." || event.key === "Decimal") {
+                if (event.key === "." || event.key === "Decimal" || event.key=== "e") {
                     event.preventDefault();
                 }
             });

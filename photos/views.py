@@ -40,12 +40,17 @@ def selectAugmentations(request):
         if(not solarizeRange[0] or not solarizeRange[1]):
             solarizeRange=[20, 40]
         solarizeRange=[int(each) for each in solarizeRange]
+        posterizeRange=[20, 30]
         print(solarizeRange)
         if(premade):
             premade=True
         else:
             premade=False
-        context = {'page':'Augment', 'augmentations': augmentations, 'premade':premade}
+        context = {'page':'Augment',
+                    'augmentations': augmentations,
+                    'premade':premade,
+                    'solarizeRange':solarizeRange,
+                    'posterizeRange':posterizeRange}
         return render(request, 'photos/photo.html', context)
     user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
 
@@ -64,6 +69,12 @@ def augment(request):
     # evaluate the string as list
     augmentations=literal_eval(augmentations)
     print(augmentations)
+
+    ranges=request.POST.getlist('ranges')
+    print(ranges)
+    ranges=literal_eval(ranges[0])
+    print(ranges[0])
+
     augmenters=[]
     if(premade=="True"):
         augmenters.append(iaa.RandAugment(n=1, m=9))

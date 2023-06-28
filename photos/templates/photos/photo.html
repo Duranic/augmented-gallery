@@ -37,6 +37,7 @@
             data : {
                 augmentations : '{{ augmentations }}',
                 premade : '{{ premade }}',
+                ranges: '[{{ solarizeRange}}, {{posterizeRange}}]',
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             },
             success: function(data) {
