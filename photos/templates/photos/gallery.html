@@ -46,7 +46,7 @@
                 <h3>No photos</h3>
                 {% endfor %}
 
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated != True %}
                 <h4>You're not logged in, please <a href="{% url 'login' %}">log in</a> or <a
                         href="{% url 'register' %}">register</a> to view photos</h4>
                 {% endif %}

@@ -35,6 +35,7 @@ def selectAugmentations(request):
     if(request.method=="POST"):
         augmentations=request.POST.getlist('augmentations')
         premade=request.POST.getlist('premade')
+        
         # if either is empty set to default values
         solarizeRange=[request.POST.get('min0'), request.POST.get('max0')]
         if(not solarizeRange[0] or not solarizeRange[1]):
@@ -72,6 +73,7 @@ def augment(request):
 
     ranges=request.POST.getlist('ranges')
     print(ranges)
+    # evaluate the string as list
     ranges=literal_eval(ranges[0])
     print(ranges[0])
 
