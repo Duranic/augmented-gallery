@@ -64,6 +64,10 @@
                         <button class="btn btn-dark m-1" type="submit" id="submitButton">Upload</button>
                     </form>
 
+                    <div class="progress">
+                        <div id="bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">0%</div>
+                      </div>
+
                     <!--WIP <form>
                         <input type="hidden" name="dir_name" id="id_dir_name">
                         <input type="file" name="file" onchange="selectFolder(event)" webkitdirectory="" multiple="" required="" directory="" id="id_file">
@@ -145,6 +149,9 @@
                         var percentComplete = (evt.loaded / evt.total) * 100;
                         percentComplete = parseInt(percentComplete);
                         console.log(percentComplete);
+
+                        $("#bar").css('width',percentComplete+'%');
+                        $("#bar").text(percentComplete+'%')
 
                         if (percentComplete === 100) {
                         // Upload completed
