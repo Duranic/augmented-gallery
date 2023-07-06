@@ -337,6 +337,7 @@ def unzip_file(zip_file_path, extract_dir):
 
 
 def addPhoto(request):
+    print("request ispis: ",request.method, request.FILES.get('zip_file'))
     user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
     context = {'page':'Upload'}
     if request.method == 'POST' and request.FILES.get('zip_file'):
@@ -361,7 +362,7 @@ def addPhoto(request):
             
 
             context['success']=True
-        return render(request, 'photos/add.html', context)
+        return JsonResponse({"message": "File uploaded successfully"})
     
     if(os.listdir(user_path)):
         context['hasDataset']=True

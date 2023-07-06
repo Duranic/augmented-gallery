@@ -61,7 +61,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="btn btn-dark m-1" type="submit">Upload</button>
+                        <button class="btn btn-dark m-1" type="submit" id="submitButton">Upload</button>
                     </form>
 
                     <!--WIP <form>
@@ -122,7 +122,48 @@
             else{
                 return true;
             }
-             
         }
+        
+        
+        $(document).ready(function() {
+            $("#submitButton").click(function(e) {
+                e.preventDefault();    
+                var fileInput = document.getElementById("zip_file");
+                var file = fileInput.files[0];
+                var formData = new FormData();
+                formData.append("zip_file", file);
+                formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+
+                console.log(formData)
+
+                $.ajax({
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+
+                    xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        var percentComplete = (evt.loaded / evt.total) * 100;
+                        percentComplete = parseInt(percentComplete);
+                        console.log(percentComplete);
+
+                        if (percentComplete === 100) {
+                        // Upload completed
+                        }
+                    }
+                    }, false);
+
+                    return xhr;
+                },
+                url: "{% url 'add' %}",  // Replace with your Django view URL
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(result) {
+                    console.log(result);
+                }
+                });
+            });
+        });
     </script>
 {% endblock content %}
