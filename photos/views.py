@@ -154,17 +154,18 @@ def augment(request):
                 case _:
                     print("illegal state")
 
-    augmentedPhotos=[]
-    photourl=os.path.normpath("..\\static"+"\\images\\tree_FD89IFe.jpg")
-    url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
-    img = cv.imread(url)
+    
     seq = iaa.Sequential(augmenters)
-    images=np.array([img, img, img])
-    photos=seq(images=images)
-    for photo in photos:
-        jpgphoto = cv.imencode('.jpg', photo)[1]
-        encoded=str(base64.b64encode(jpgphoto), "utf-8")
-        augmentedPhotos.append(encoded)
+    # photourl=os.path.normpath("..\\static"+"\\images\\tree_FD89IFe.jpg")
+    # url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
+    # img = cv.imread(url)
+    
+    # images=np.array([img, img, img])
+    # photos=seq(images=images)
+    # for photo in photos:
+    #     jpgphoto = cv.imencode('.jpg', photo)[1]
+    #     encoded=str(base64.b64encode(jpgphoto), "utf-8")
+    #     augmentedPhotos.append(encoded)
     user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
     for subdir, dirs, files in os.walk(user_path):
         for file in files:
@@ -184,7 +185,7 @@ def augment(request):
                     # Save the augmented image in the same directory
                     augmented_file_path = os.path.join(subdir, f"augmented_{i}{file}")
                     augmented_image_pil.save(augmented_file_path, format='PNG')
-    return JsonResponse({'url': augmentedPhotos[0]})
+    return JsonResponse({'url': "aaa"})
 
 def registerPage(request):
     form=CreateUserForm()

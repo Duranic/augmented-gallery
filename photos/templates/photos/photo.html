@@ -45,8 +45,8 @@
                 console.log(data)
                 $('#loading-message').hide();
                 $('#spinner').hide();
-                $('#processed-image').attr('src', "data:image/jpeg; base64,"+ data.url);
-                $('#processed-image').show();
+                // $('#processed-image').attr('src', "data:image/jpeg; base64,"+ data.url);
+                // $('#processed-image').show();
                 $('#download-message').show();
                 // Make an AJAX request to the server to create the zip file
                 $.ajax({

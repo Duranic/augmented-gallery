@@ -24,9 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=qmc8w4t36jsv=pwx+ymj2^8%)9z*=uc!7di94(6j$ilsz*4w+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["192.168.56.1", "127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
+
+CSRF_TRUSTED_ORIGINS = ['https://augmentiotest.azurewebsites.net']
 
 
 # Application definition
@@ -37,10 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # #remove
+    # 'whitenoise.runserver_nostatic',
+
     'django.contrib.staticfiles',
     
     'photos.apps.PhotosConfig',
-    'debug_toolbar'
 ]
 
 MIDDLEWARE = [
@@ -51,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'gallery.urls'
@@ -120,11 +124,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_URL = 'images/'
-STATICFILES_DIRS = [BASE_DIR/STATIC_URL]
-MEDIA_ROOT = BASE_DIR/STATIC_URL/MEDIA_URL
+# STATIC_URL = 'static/'
+# MEDIA_URL = 'images/'
+
+# MEDIA_ROOT = BASE_DIR/STATIC_URL/MEDIA_URL
+# MEDIA_URL = 'dynamic/'
+# MEDIA_ROOT = BASE_DIR/MEDIA_URL
 STATIC_ROOT = BASE_DIR/'staticfiles'
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [BASE_DIR/STATIC_URL]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 # Default primary key field type

@@ -38,19 +38,17 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    {% if success %}
                     <div class="success mb-3">
                         Successfully uploaded the dataset!
                     </div>
-                    {% elif hasDataset %} 
+                    {% if hasDataset %} 
                     <div class="warning mb-3">
-                        <!-- <img class="float-left" src="../../static/images/warning.png" alt="Dataset warning"> -->
                         <img class="float-left" src="{% static 'warning.png' %}" alt="Dataset warning">
                         You already have an uploaded dataset. Uploading a new dataset will delete the existing dataset.
                     </div>
                     {% endif %}
                     <h2>Upload new dataset</h2>
-                    <form method="post" enctype="multipart/form-data"  onsubmit="return validateFile();">
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="form-group">
                             <div class="mb-3">
@@ -66,48 +64,8 @@
 
                     <div class="progress">
                         <div id="bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">0%</div>
-                      </div>
+                    </div>
 
-                    <!--WIP <form>
-                        <input type="hidden" name="dir_name" id="id_dir_name">
-                        <input type="file" name="file" onchange="selectFolder(event)" webkitdirectory="" multiple="" required="" directory="" id="id_file">
-                        <button type="submit" class="btn btn-primary m-3">Submit</button>
-                    </form> -->
-                    <!-- OLD <a href="{% url 'gallery' %}" class="btn btn-outline-dark m-1">Go back</a>
-                    <div class="card">
-
-                        <form method="POST" action="" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="form-group m-3">
-                                <label>Description</label>
-                                <input required name="description" type="text" placeholder="Enter a description" class="form-control">
-                            </div>
-
-                            <div class="form-group m-3">
-                                <label>Select a category</label>
-                                <select name="category" class="form-control">
-                                    <option value='null'>Select a category...</option>
-
-                                    {% for category in categories %}
-                                    <option value="{{category.id}}">{{category.name}}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-
-                            <div class="form-group m-3">
-                                <label>Create a new category</label>
-                                <input name="category-new" type="text" placeholder="Create a new category" class="form-control">
-                            </div>
-
-                            <div class="form-group m-3">
-                                <label>Upload images</label>
-                                <input required name="images" type="file" multiple class="form-control-file">
-                            </div>
-
-                            <button type="submit" class="btn btn-primary m-3">Submit</button>
-
-                        </form>
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -130,46 +88,51 @@
         
         
         $(document).ready(function() {
+            $(".success").hide();
             $("#submitButton").click(function(e) {
-                e.preventDefault();    
-                var fileInput = document.getElementById("zip_file");
-                var file = fileInput.files[0];
-                var formData = new FormData();
-                formData.append("zip_file", file);
-                formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+                e.preventDefault();
+                if(validateFile()){    
+                    var fileInput = document.getElementById("zip_file");
+                    var file = fileInput.files[0];
+                    var formData = new FormData();
+                    formData.append("zip_file", file);
+                    formData.append("csrfmiddlewaretoken", '{{ csrf_token }}');
 
-                console.log(formData)
+                    console.log(formData)
 
-                $.ajax({
-                xhr: function() {
-                    var xhr = new window.XMLHttpRequest();
+                    $.ajax({
+                    xhr: function() {
+                        var xhr = new window.XMLHttpRequest();
 
-                    xhr.upload.addEventListener("progress", function(evt) {
-                    if (evt.lengthComputable) {
-                        var percentComplete = (evt.loaded / evt.total) * 100;
-                        percentComplete = parseInt(percentComplete);
-                        console.log(percentComplete);
+                        xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = (evt.loaded / evt.total) * 100;
+                            percentComplete = parseInt(percentComplete);
+                            console.log(percentComplete);
 
-                        $("#bar").css('width',percentComplete+'%');
-                        $("#bar").text(percentComplete+'%')
+                            $("#bar").css('width',percentComplete+'%');
+                            $("#bar").text(percentComplete+'%')
 
-                        if (percentComplete === 100) {
-                        // Upload completed
+                            if (percentComplete === 100) {
+                            // Upload completed
+                            }
                         }
-                    }
-                    }, false);
+                        }, false);
 
-                    return xhr;
-                },
-                url: "{% url 'add' %}",  // Replace with your Django view URL
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(result) {
-                    console.log(result);
+                        return xhr;
+                    },
+                    url: "{% url 'add' %}",  // Replace with your Django view URL
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(result) {
+                        console.log(result);
+                        $(".success").html(result["message"]);
+                        $(".success").show();
+                    }
+                    });
                 }
-                });
             });
         });
     </script>
