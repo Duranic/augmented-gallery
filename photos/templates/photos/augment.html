@@ -27,12 +27,24 @@
         .input-group-text, input[type='number'] {
             height: 30px;
         }
+        .preview{
+            min-height: 180px;
+        }
 
     </style>
 
     <div class="container mycont mt-5 mx-2">
         <div class="row">
-            <div class="col-sm-7">
+            <div class="col-sm-5 order-sm-2 preview">
+                <h2 id="mouseover">Mouseover for a preview</h2>
+                
+                {% for item in list %}
+                    {% with "preview"|add:item|add:".png" as url %}
+                    <img alt="preview image" class="img-fluid" id="img{{ forloop.counter0 }}" src="{% static url %}">
+                    {% endwith %}
+                {% endfor %}
+            </div>
+            <div class="col-sm-7 order-sm-1">
                 {% if hasDataset is False %}
                     <div class="mb-3">
                         You don't have an uploaded dataset, go upload one.
@@ -333,15 +345,6 @@
                         </div>
                     </form>    
                 </div>
-            </div>
-            <div class="col-sm-5">
-                <h2 id="mouseover">Mouseover for a preview</h2>
-                
-                {% for item in list %}
-                    {% with "preview"|add:item|add:".png" as url %}
-                    <img alt="preview image" class="img-fluid" id="img{{ forloop.counter0 }}" src="{% static url %}">
-                    {% endwith %}
-                {% endfor %}
             </div>
         </div>
     </div>

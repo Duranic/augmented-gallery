@@ -262,8 +262,8 @@ def download(request):
         return FileResponse(open(filename, 'rb'), as_attachment=True, filename='dataset.zip')
     return HttpResponseBadRequest()
 
-def zip_folder_thread(queue, folder_path):
-    zip_file = tempfile.NamedTemporaryFile(delete=False)
+def zip_folder_thread(queue, folder_path, output_path):
+    zip_file = tempfile.NamedTemporaryFile(delete=False, dir=output_path)
     name=zip_file.name
     with ZipFile(zip_file, 'w') as zip_file:
         for root, dirs, files in os.walk(folder_path):
@@ -281,10 +281,11 @@ def viewPhoto(request):
         
         queue = Queue()
         folder_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented"))
+        output_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username))
         print(folder_path)
         if folder_path:
             # Start the zip process in a new thread
-            thread = threading.Thread(target=zip_folder_thread, args=(queue, folder_path,))
+            thread = threading.Thread(target=zip_folder_thread, args=(queue, folder_path, output_path))
             thread.start()
             # Return a JSON response containing the URL to the temporary file
             filename=queue.get()
