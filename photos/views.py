@@ -78,7 +78,7 @@ def selectAugmentations(request):
         shearxRange=[int(each)/100 for each in shearxRange]
         shearyRange=[int(each)/100 for each in shearyRange]
         rotateRange=[int(each) for each in rotateRange]
-        print (translatexRange)
+        print (solarizeRange)
 
         ranges=[solarizeRange, posterizeRange, translatexRange, translateyRange, shearxRange, shearyRange, rotateRange]
         if(premade):
@@ -91,7 +91,7 @@ def selectAugmentations(request):
                     'ranges': ranges,
                     'numberOfImages': numberOfImages}
         return render(request, 'photos/photo.html', context)
-    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
+    user_path = os.path.join(settings.MEDIA_ROOT, request.user.username)
 
     if( not(os.listdir(user_path))):
         print("is empty")
@@ -166,8 +166,12 @@ def augment(request):
     #     jpgphoto = cv.imencode('.jpg', photo)[1]
     #     encoded=str(base64.b64encode(jpgphoto), "utf-8")
     #     augmentedPhotos.append(encoded)
-    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
-    for subdir, dirs, files in os.walk(user_path):
+    dataset_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
+    augmented_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented")
+    shutil.rmtree(augmented_folder)
+    shutil.copytree(dataset_folder, augmented_folder)
+
+    for subdir, dirs, files in os.walk(augmented_folder):
         for file in files:
             # Create the full file path
             file_path = os.path.join(subdir, file)
@@ -195,16 +199,24 @@ def registerPage(request):
         if form.is_valid():
             form.save()
             
-            #Creating a folder for each registered user
-            new_dir_path = os.path.join(settings.PROJECT_ROOT,'..', 'dynamic', request.POST.get('username'))
+            #Creating folders for each registered user
+            dataset_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "dataset")
+            augmented_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "augmented")
             try:
-                os.mkdir(new_dir_path)
+                os.makedirs(dataset_path)
+                os.makedirs(augmented_path)
             except OSError as e:
                 if e.errno != errno.EEXIST:
-                    #directory already exists
+                    print(e)
                     pass
                 else:
                     print(e)
+            
+            user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password1'))
+        
+            if user is not None:
+                login(request, user)
+                return redirect("gallery")
 
     context={'page':'Register','form':form}
 
@@ -219,6 +231,9 @@ def loginPage(request):
         if user is not None:
             login(request, user)
             return redirect("gallery")
+        else:
+            context={'page':'Login', 'error_message': 'Username or password entered was incorrect'}
+            return render(request, "photos/login.html", context)
 
     context={'page':'Login'}
     return render(request, "photos/login.html", context)
@@ -248,7 +263,6 @@ def download(request):
     return HttpResponseBadRequest()
 
 def zip_folder_thread(queue, folder_path):
-    time.sleep(1)
     zip_file = tempfile.NamedTemporaryFile(delete=False)
     name=zip_file.name
     with ZipFile(zip_file, 'w') as zip_file:
@@ -266,7 +280,7 @@ def viewPhoto(request):
     if request.method == 'POST':
         
         queue = Queue()
-        folder_path = os.path.normpath(os.path.join(settings.PROJECT_ROOT, "..", "dynamic/",request.user.username))
+        folder_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented"))
         print(folder_path)
         if folder_path:
             # Start the zip process in a new thread
@@ -339,7 +353,7 @@ def unzip_file(zip_file_path, extract_dir):
 
 def addPhoto(request):
     print("request ispis: ",request.method, request.FILES.get('zip_file'))
-    user_path = os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", request.user.username)
+    user_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
     context = {'page':'Upload'}
     if request.method == 'POST' and request.FILES.get('zip_file'):
         if (request.user.is_authenticated):
@@ -361,8 +375,6 @@ def addPhoto(request):
                 zip_ref.extractall(user_path)
 
             
-
-            context['success']=True
         return JsonResponse({"message": "File uploaded successfully"})
     
     if(os.listdir(user_path)):

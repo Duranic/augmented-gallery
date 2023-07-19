@@ -38,9 +38,6 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <div class="success mb-3">
-                        Successfully uploaded the dataset!
-                    </div>
                     {% if hasDataset %} 
                     <div class="warning mb-3">
                         <img class="float-left" src="{% static 'warning.png' %}" alt="Dataset warning">
@@ -66,6 +63,10 @@
                         <div id="bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">0%</div>
                     </div>
 
+                    <div class="success my-3" style="display: none;">
+                        Successfully uploaded the dataset!
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -88,7 +89,6 @@
         
         
         $(document).ready(function() {
-            $(".success").hide();
             $("#submitButton").click(function(e) {
                 e.preventDefault();
                 if(validateFile()){    
@@ -130,6 +130,7 @@
                         console.log(result);
                         $(".success").html(result["message"]);
                         $(".success").show();
+                        $("#bar").addClass("bg-success");
                     }
                     });
                 }
