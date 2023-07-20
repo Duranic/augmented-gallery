@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from .models import Dataset
 from django.conf import settings
 from .models import Category, Photo
 from django import forms
@@ -17,7 +19,6 @@ from PIL import Image
 import glob
 import threading
 import time
-import cv2 as cv
 import os, shutil, errno
 from imgaug import augmenters as iaa
 import numpy as np
@@ -75,8 +76,8 @@ def selectAugmentations(request):
         posterizeRange=[int(each) for each in posterizeRange]
         translatexRange=[int(each)/100 for each in translatexRange]
         translateyRange=[int(each)/100 for each in translateyRange]
-        shearxRange=[int(each)/100 for each in shearxRange]
-        shearyRange=[int(each)/100 for each in shearyRange]
+        shearxRange=[int(each) for each in shearxRange]
+        shearyRange=[int(each) for each in shearyRange]
         rotateRange=[int(each) for each in rotateRange]
         print (solarizeRange)
 
@@ -246,6 +247,18 @@ def gallery(request):
     if request.user.is_authenticated==False:
         context = {'page':'Home', 'categories': None, 'photos': None, 'user': None}
         return render(request, 'photos/gallery.html', context)
+    
+    print(request.user)
+    user = User.objects.get(username=request.user)
+    try:
+        dataset = user.dataset  # 'dataset' is the related name defined in the OneToOneField
+        dataset_name = dataset.name
+        creationDate = dataset.creationDate
+    except Dataset.DoesNotExist:
+        # The dataset does not exist for this user
+        dataset_name = "No dataset found"
+        creationDate = None
+    print(dataset_name, creationDate)
     category = request.GET.get('category')
     categories = Category.objects.all
     if category==None:
@@ -353,11 +366,24 @@ def unzip_file(zip_file_path, extract_dir):
 
 
 def addPhoto(request):
-    print("request ispis: ",request.method, request.FILES.get('zip_file'))
     user_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
     context = {'page':'Upload'}
     if request.method == 'POST' and request.FILES.get('zip_file'):
         if (request.user.is_authenticated):
+            user = User.objects.get(username=request.user)
+            try:
+                dataset = user.dataset
+            except Dataset.DoesNotExist:
+                dataset = None
+
+            # Delete the dataset if it exists
+            if dataset:
+                dataset.delete()
+            
+            zip_file = request.FILES['zip_file']
+            new_dataset = Dataset(user=user, name=zip_file)
+            new_dataset.save()
+
             if(os.listdir(user_path)):
                 # deletes existing dataset
                 shutil.rmtree(user_path)
@@ -371,7 +397,8 @@ def addPhoto(request):
                     else:
                         print(e)
             
-            zip_file = request.FILES['zip_file']
+            
+            
             with ZipFile(zip_file, 'r') as zip_ref:
                 zip_ref.extractall(user_path)
 
