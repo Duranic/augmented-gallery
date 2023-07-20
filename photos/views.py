@@ -245,27 +245,27 @@ def logoutUser(request):
 
 def gallery(request):
     if request.user.is_authenticated==False:
-        context = {'page':'Home', 'categories': None, 'photos': None, 'user': None}
+        context = {'page':'Home', 'user': None}
         return render(request, 'photos/gallery.html', context)
     
     print(request.user)
     user = User.objects.get(username=request.user)
     try:
         dataset = user.dataset  # 'dataset' is the related name defined in the OneToOneField
-        dataset_name = dataset.name
+        datasetName = dataset.name
         creationDate = dataset.creationDate
     except Dataset.DoesNotExist:
         # The dataset does not exist for this user
-        dataset_name = "No dataset found"
+        datasetName = "No dataset found"
         creationDate = None
-    print(dataset_name, creationDate)
+    print(datasetName, creationDate)
     category = request.GET.get('category')
     categories = Category.objects.all
     if category==None:
         photos = Photo.objects.all
     else:
         photos=Photo.objects.filter(category__name=category)
-    context = {'page':'Home', 'categories': categories, 'photos': photos, 'user': request.user}
+    context = {'page':'Home', 'user': request.user, 'creationDate': creationDate, 'datasetName': datasetName}
     return render(request, 'photos/gallery.html', context)
 
 def download(request):
