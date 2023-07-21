@@ -203,9 +203,11 @@ def registerPage(request):
             #Creating folders for each registered user
             dataset_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "dataset")
             augmented_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "augmented")
+            temp_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "temp")
             try:
                 os.makedirs(dataset_path)
                 os.makedirs(augmented_path)
+                os.makedirs(temp_path)
             except OSError as e:
                 if e.errno != errno.EEXIST:
                     print(e)
@@ -256,7 +258,7 @@ def gallery(request):
         creationDate = dataset.creationDate
     except Dataset.DoesNotExist:
         # The dataset does not exist for this user
-        datasetName = "No dataset found"
+        datasetName = None
         creationDate = None
     print(datasetName, creationDate)
     category = request.GET.get('category')
@@ -294,15 +296,21 @@ def viewPhoto(request):
         
         queue = Queue()
         folder_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented"))
-        output_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username))
-        print(folder_path)
+        output_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username, "temp"))
         if folder_path:
+            # delete the previous zip file
+            shutil.rmtree(output_path)
+            os.mkdir(output_path)
+
             # Start the zip process in a new thread
             thread = threading.Thread(target=zip_folder_thread, args=(queue, folder_path, output_path))
             thread.start()
-            # Return a JSON response containing the URL to the temporary file
             filename=queue.get()
-            print(filename)
+
+            # Delete the augmented dataset since the zip file is created
+            shutil.rmtree(folder_path)
+            os.mkdir(folder_path)
+            # Return a JSON response containing the URL to the temporary file
             return JsonResponse({'url': filename})
     return render(request, 'photos/photo.html', context)
     
@@ -392,7 +400,6 @@ def addPhoto(request):
                         os.mkdir(user_path)
                 except OSError as e:
                     if e.errno != errno.EEXIST:
-                        #directory already exists
                         pass
                     else:
                         print(e)
@@ -409,6 +416,38 @@ def addPhoto(request):
         context['hasDataset']=True
     
     return render(request, 'photos/add.html', context)
+
+
+def deleteDataset(request):
+    if request.user.is_authenticated:
+        user = User.objects.get(username=request.user)
+        try:
+            dataset = user.dataset  # 'dataset' is the related name defined in the OneToOneField
+        except Dataset.DoesNotExist:
+                dataset = None
+
+        # Delete the dataset if it exists
+        if dataset:
+            dataset.delete()
+        
+        user_path = os.path.join(settings.MEDIA_ROOT, request.user.username)
+        dataset_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
+        augmented_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented")
+        temp_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "temp")
+        
+        shutil.rmtree(user_path)
+        try:
+            os.makedirs(dataset_path)
+            os.makedirs(augmented_path)
+            os.makedirs(temp_path)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                print(e)
+                pass
+            else:
+                print(e)
+
+        return redirect('gallery')
 
     
     

@@ -11,4 +11,5 @@ urlpatterns = [
     path('augment/', views.selectAugmentations, name='augment'),
     path('process_image/', views.augment, name='process_image'),
     path('download/', views.download, name='download'),
+    path('delete/', views.deleteDataset, name='delete'),
 ]

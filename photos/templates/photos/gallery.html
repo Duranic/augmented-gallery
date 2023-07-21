@@ -6,49 +6,6 @@
 
 
 {% block content %}
-<div class="container">
-    {% if user.is_authenticated %}
-    <div class="row m-5">
-        <div class="col-md-3">
-            <div class="card my-2">
-                <div class="card-header">
-                    Manage dataset
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <a class="links" href="{% url 'add' %}">Delete the dataset</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a class="links" href="{% url 'add' %}">Upload new dataset</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a class="links" href="{% url 'augment' %}">Augment dataset</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="col-md-9">
-            <h1>dataset info</h1>
-            <h2>{{datasetName}}</h2>
-        </div>
-    </div>
-    {% else %}
-    <div class="row m-5">
-        <div class="col-md-9">
-            <h3><a href="{% url 'login' %}">Login</a> or <a href="{% url 'register' %}">register</a> to access all features</h3>
-            <p>With an account you can upload your dataset, select augmentations and preview the results.</p>
-        </div>
-    </div>
-    {% endif %}
-    <div class="row m-5">
-
-        <div class="col-md-9">
-            <h2>About</h2>
-        </div>
-    </div>
-</div>
-
 
 <style>
     .card-img-top {
@@ -63,9 +20,86 @@
 
     .links {
         color: inherit;
+        font-weight: 500;
         text-decoration: inherit;
         display: block;
     }
+
 </style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        {% if user.is_authenticated %}
+            {% if datasetName is not None %}
+            <div class="col-md-3">
+                <div class="card my-2">
+                    <div class="card-header">
+                        Manage dataset
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'delete' %}">Delete the dataset</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'add' %}">Upload new dataset</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'augment' %}">Augment dataset</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card my-2">
+                    <div class="card">
+                        <div class="row no-gutters">
+                            <div class="col-md-2">
+                                <img src="{% static 'dataset.png' %}" alt="Image" class="card-img">
+                            </div>
+                            <div class="col-md-10">
+                                <div class="card-body">
+                                    <h4 class="card-title">{{datasetName}}</h4>
+                                    <h5 class="card-text">Date added: {{creationDate}}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-md-3">
+                <div class="card my-2">
+                    <div class="card-header">
+                        Manage dataset
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'add' %}">Upload new dataset</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div class="col-md-9">
+                <div class="card my-2">
+                    <h3 class="m-3">Please upload a dataset</h3>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+        <div class="col-md-9">
+            <h3 class="text-center"><a class="link-dark" href="{% url 'login' %}">Login</a> or <a class="link-dark" href="{% url 'register' %}">register</a> to access all features</h3>
+            <p class="text-center">With an account you can upload your dataset, select augmentations and preview the results.</p>
+        </div>
+        {% endif %}
+    </div>
+    <div class="row mt-5 justify-content-center">
+        <div class="col-md">
+            <h2 class="text-center">About</h2>
+            <p class="text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </div>
+    </div>
+</div
 
 {% endblock content %}
