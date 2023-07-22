@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Dataset
 from django.conf import settings
@@ -27,10 +28,7 @@ import tempfile
 
 
 
-
-
-task_complete = False
-
+@login_required
 def selectAugmentations(request):
     context = {'page':'Augment'}
     if(request.method=="POST"):
@@ -38,48 +36,47 @@ def selectAugmentations(request):
         premade=request.POST.getlist('premade')
         
         # get the appropriate values for every augmentation
-        solarizeRange=[request.POST.get('min0'), request.POST.get('max0')]
-        posterizeRange=[request.POST.get('min1')]
-        translatexRange=[request.POST.get('min2'), request.POST.get('max2')]
-        translateyRange=[request.POST.get('min3'), request.POST.get('max3')]
-        shearxRange=[request.POST.get('min4'), request.POST.get('max4')]
-        shearyRange=[request.POST.get('min5'), request.POST.get('max5')]
-        rotateRange=[request.POST.get('min8'), request.POST.get('max8')]
+        solarizeRange=(request.POST.get('min0'), request.POST.get('max0'))
+        posterizeRange=request.POST.get('min1')
+        translatexRange=(request.POST.get('min2'), request.POST.get('max2'))
+        translateyRange=(request.POST.get('min3'), request.POST.get('max3'))
+        shearxRange=(request.POST.get('min4'), request.POST.get('max4'))
+        shearyRange=(request.POST.get('min5'), request.POST.get('max5'))
+        rotateRange=(request.POST.get('min8'), request.POST.get('max8'))
 
         numberOfImages=request.POST.get('imageRange')
         print(numberOfImages)
 
         # if either is empty set to default values
         if(not solarizeRange[0] or not solarizeRange[1]):
-            solarizeRange=[32, 128]
+            solarizeRange=(32, 128)
         
-        if(not posterizeRange[0]):
-            posterizeRange=[3]
+        if(not posterizeRange):
+            posterizeRange=3
 
         if(not translatexRange[0] or not translatexRange[1]):
-            translatexRange=[-20, 20]
+            translatexRange=(-20, 20)
 
         if(not translateyRange[0] or not translateyRange[1]):
-            translateyRange=[-20, 20]
+            translateyRange=(-20, 20)
 
         if(not shearxRange[0] or not shearxRange[1]):
-            shearxRange=[-20, 20]
+            shearxRange=(-20, 20)
 
         if(not shearyRange[0] or not shearyRange[1]):
-            shearyRange=[-20, 20]
+            shearyRange=(-20, 20)
 
         if(not rotateRange[0] or not rotateRange[1]):
-            rotateRange=[-45, 45]
+            rotateRange=(-45, 45)
 
         
-        solarizeRange=[int(each) for each in solarizeRange]
-        posterizeRange=[int(each) for each in posterizeRange]
-        translatexRange=[int(each)/100 for each in translatexRange]
-        translateyRange=[int(each)/100 for each in translateyRange]
-        shearxRange=[int(each) for each in shearxRange]
-        shearyRange=[int(each) for each in shearyRange]
-        rotateRange=[int(each) for each in rotateRange]
-        print (solarizeRange)
+        solarizeRange=(int(solarizeRange[0]), int(solarizeRange[1]))
+        posterizeRange=int(posterizeRange)
+        translatexRange=(int(translatexRange[0])/100, int(translatexRange[1])/100)
+        translateyRange=(int(translateyRange[0])/100, int(translateyRange[1])/100)
+        shearxRange=(int(shearxRange[0]), int(shearxRange[1]))
+        shearyRange=(int(shearyRange[0]), int(shearyRange[1]))
+        rotateRange=(int(rotateRange[0]), int(rotateRange[1]))
 
         ranges=[solarizeRange, posterizeRange, translatexRange, translateyRange, shearxRange, shearyRange, rotateRange]
         if(premade):
@@ -102,6 +99,7 @@ def selectAugmentations(request):
     context['list']=items
     return render(request, "photos/augment.html", context)
 
+@login_required
 def augment(request):
     premade=request.POST.getlist('premade')[0]
     # clean up the string from ajax
@@ -114,7 +112,7 @@ def augment(request):
 
     # evaluate the string as list
     ranges=literal_eval(ranges[0])
-    print(ranges[4])
+    print(ranges)
 
     numberOfImages=int(request.POST.get('numberOfImages'))
     print(numberOfImages)
@@ -289,7 +287,7 @@ def zip_folder_thread(queue, folder_path, output_path):
     zip_file.close()
     queue.put(name)
 
-
+@login_required
 def viewPhoto(request):
     context = {'page':'Augment'}
     if request.method == 'POST':
@@ -366,13 +364,14 @@ def viewPhoto(request):
 
     # context = {'photo': photo, 'augmentedPhotos': augmentedPhotos}
     # return render(request, 'photos/photo.html', context)
-
+    
+@login_required
 def unzip_file(zip_file_path, extract_dir):
     with ZipFile(zip_file_path, 'r') as zip_ref:
         zip_ref.extractall(extract_dir)
 
 
-
+@login_required
 def addPhoto(request):
     user_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
     context = {'page':'Upload'}
@@ -417,7 +416,7 @@ def addPhoto(request):
     
     return render(request, 'photos/add.html', context)
 
-
+@login_required
 def deleteDataset(request):
     if request.user.is_authenticated:
         user = User.objects.get(username=request.user)

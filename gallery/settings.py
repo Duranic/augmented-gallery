@@ -30,6 +30,8 @@ ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = ['https://augmentiotest.azurewebsites.net']
 
+LOGIN_URL="/login/"
+
 
 # Application definition
 

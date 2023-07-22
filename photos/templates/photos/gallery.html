@@ -8,9 +8,10 @@
 {% block content %}
 
 <style>
-    .card-img-top {
-        height: 200px;
-        object-fit: cover;
+    .card-img {
+        max-height: 150px;
+        width: auto;
+        height: auto;
     }
 
     .center {
@@ -54,10 +55,10 @@
                 <div class="card my-2">
                     <div class="card">
                         <div class="row no-gutters">
-                            <div class="col-md-2">
-                                <img src="{% static 'dataset.png' %}" alt="Image" class="card-img">
+                            <div class="col-md-3">
+                                <img src="{% static 'dataset.png' %}" class="card-img">
                             </div>
-                            <div class="col-md-10">
+                            <div class="col-md-9">
                                 <div class="card-body">
                                     <h4 class="card-title">{{datasetName}}</h4>
                                     <h5 class="card-text">Date added: {{creationDate}}</h5>

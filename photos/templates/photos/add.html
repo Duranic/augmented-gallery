@@ -12,9 +12,6 @@
         .warning{
             background-color: lightgoldenrodyellow;
         }
-        .success{
-            background-color: lightblue;
-        }
 
 
         .custom-file-button input[type=file] {
@@ -59,11 +56,11 @@
                         <button class="btn btn-dark m-1" type="submit" id="submitButton">Upload</button>
                     </form>
 
-                    <div class="progress">
+                    <div class="progress my-3" style="display: none;">
                         <div id="bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">0%</div>
                     </div>
 
-                    <div class="success my-3" style="display: none;">
+                    <div id="success" class="my-3" style="display: none;">
                         Successfully uploaded the dataset!
                     </div>
 
@@ -89,6 +86,7 @@
         
         
         $(document).ready(function() {
+            // $(".progress").hide();
             $("#submitButton").click(function(e) {
                 e.preventDefault();
                 if(validateFile()){    
@@ -103,6 +101,7 @@
                     $.ajax({
                     xhr: function() {
                         var xhr = new window.XMLHttpRequest();
+                        $(".progress").show();
 
                         xhr.upload.addEventListener("progress", function(evt) {
                         if (evt.lengthComputable) {
@@ -127,9 +126,8 @@
                     processData: false,
                     contentType: false,
                     success: function(result) {
-                        console.log(result);
-                        $(".success").html(result["message"]);
-                        $(".success").show();
+                        $("#success").html(result["message"]);
+                        $("#success").show();
                         $("#bar").addClass("bg-success");
                     }
                     });

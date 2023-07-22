@@ -344,6 +344,10 @@
                         <div class="p-1">
                             <button type="submit" class='btn btn-dark col-12'>Augment</button>
                         </div>
+
+                        <button type="button" class="btn btn-secondary tt" title="Tooltip on top">
+                            Tooltip on top
+                        </button>
                     </form>    
                 </div>
             </div>
@@ -353,6 +357,10 @@
 
     
       <script>
+        const tooltipTriggerList = document.querySelectorAll('.tt')
+        tooltipTriggerList.forEach(t => {
+            new bootstrap.Tooltip(t);
+        })
         $(document).ready(function() {
             $('input:checkbox[id^="custom"]').change(function() {
                 if (this.checked) {
@@ -394,10 +402,12 @@
         function premadeCheck(){
             if(flag){
                 $('input:checkbox[id^="custom"]').prop("disabled", true);
+                $('input[id^="m"]').prop("disabled", true)
                 flag=0;
             }
             else{
                 $('input:checkbox[id^="custom"]').prop("disabled", false);
+                $('input[id^="m"]').prop("disabled", false)
                 flag=1;
             }
         }
