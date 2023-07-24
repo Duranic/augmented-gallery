@@ -56,7 +56,7 @@
                 {% if hasDataset is False %}
                 <div class="warning mb-3">
                     <img id="warning-img" class="float-left" src="{% static 'warning.png' %}" alt="Dataset warning">
-                    You don't have an uploaded dataset. Please upload one to enable augmentation.
+                    You don't have an uploaded dataset. Please <a class="link-dark" href="{% url 'add' %}">upload</a> one to enable augmentation.
                 </div>
                 {% endif %}
             </div>
@@ -141,7 +141,7 @@
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-2">
-                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Reduce the number of color levels in an image, resulting in a poster-like effect with fewer color tones. Enter the number of bits.">
+                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Reduces the number of color levels in an image, resulting in a poster-like effect with fewer color tones. Enter the number of bits per color.">
                                                                             </div>
                                                                         </div>
                                                                     </div>

@@ -60,7 +60,7 @@
                     </div>
 
                     <div id="success" class="my-3" style="display: none;">
-                        Successfully uploaded the dataset!
+                        message
                     </div>
 
                 </div>
@@ -75,6 +75,7 @@
             console.log(fileType)
             
             if (fileType !== 'application/zip' && fileType !== 'application/x-zip-compressed') {
+                $("#submitButton").prop("disabled", false);
                 alert('Please select a ZIP file.');
                 return false;
             }
@@ -85,8 +86,8 @@
         
         
         $(document).ready(function() {
-            // $(".progress").hide();
             $("#submitButton").click(function(e) {
+                $("#submitButton").prop("disabled", true)
                 e.preventDefault();
                 if(validateFile()){    
                     var fileInput = document.getElementById("zip_file");
@@ -101,33 +102,38 @@
                     xhr: function() {
                         var xhr = new window.XMLHttpRequest();
                         $(".progress").show();
+                        document.getElementById("bar").className = "progress-bar bg-primary";
 
                         xhr.upload.addEventListener("progress", function(evt) {
                         if (evt.lengthComputable) {
-                            var percentComplete = (evt.loaded / evt.total) * 100;
+                            var percentComplete = (evt.loaded / evt.total) * 80;
                             percentComplete = parseInt(percentComplete);
                             console.log(percentComplete);
 
                             $("#bar").css('width',percentComplete+'%');
                             $("#bar").text(percentComplete+'%')
 
-                            if (percentComplete === 100) {
-                            // Upload completed
+                            if (percentComplete === 80) {
+                                $("#success").html("Extracting the files...");
+                                $("#success").show();
                             }
                         }
                         }, false);
 
                         return xhr;
                     },
-                    url: "{% url 'add' %}",  // Replace with your Django view URL
+                    url: "{% url 'add' %}",
                     type: "POST",
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function(result) {
+                        $("#bar").css('width','100%');
+                        $("#bar").text('100%')
                         $("#success").html(result["message"]);
                         $("#success").show();
                         $("#bar").addClass("bg-success");
+                        $("#submitButton").prop("disabled", false)
                     }
                     });
                 }

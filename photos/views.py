@@ -4,26 +4,149 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Dataset
 from django.conf import settings
-from .models import Category, Photo
-from django import forms
 from .forms import CreateUserForm
-from django.http import JsonResponse, FileResponse
+from django.http import JsonResponse, FileResponse, HttpResponseBadRequest, HttpResponse
 from html import unescape
 from ast import literal_eval
-from django.http import HttpResponseBadRequest
-from django.views.decorators.http import require_GET
 from django.core.files.base import ContentFile
 from zipfile import ZipFile
-from io import BytesIO
 from queue import Queue
 from PIL import Image
 import threading
-import time
-import os, shutil, errno
+import os, shutil
 from imgaug import augmenters as iaa
 import numpy as np
-import base64
 import tempfile
+
+
+def gallery(request):
+    if request.user.is_authenticated==False:
+        context = {'page':'Home', 'user': None}
+        return render(request, 'photos/gallery.html', context)
+    
+    user = User.objects.get(username=request.user)
+    try:
+        dataset = user.dataset  # 'dataset' is the related name defined in the OneToOneField
+        datasetName = dataset.name
+        creationDate = dataset.creationDate
+    except Dataset.DoesNotExist:
+        # The dataset does not exist for this user
+        datasetName = None
+        creationDate = None
+    
+    context = {'page':'Home', 'user': request.user, 'creationDate': creationDate, 'datasetName': datasetName}
+    return render(request, 'photos/gallery.html', context)
+
+
+def registerPage(request):
+    form=CreateUserForm()
+
+    if request.method=='POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            
+            #Creating folders for each registered user
+            dataset_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "dataset")
+            augmented_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "augmented")
+            temp_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "temp")
+            try:
+                os.makedirs(dataset_path)
+                os.makedirs(augmented_path)
+                os.makedirs(temp_path)
+            except Exception as e:
+                print(e)
+                return HttpResponse('Something went wrong')
+            
+            user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password1'))
+        
+            if user is not None:
+                login(request, user)
+                return redirect("gallery")
+
+    context={'page':'Register','form':form}
+
+    return render(request, "photos/register.html", context)
+
+
+def loginPage(request):
+    if request.method=="POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return redirect("gallery")
+        else:
+            context={'page':'Login', 'error_message': 'Username or password entered was incorrect'}
+            return render(request, "photos/login.html", context)
+
+    context={'page':'Login'}
+    return render(request, "photos/login.html", context)
+
+
+def logoutUser(request):
+    logout(request)
+    return redirect('gallery')
+
+
+@login_required
+def addPhoto(request):
+    user = User.objects.get(username=request.user)
+    try:
+        dataset = user.dataset
+    except Dataset.DoesNotExist:
+        dataset = None
+    
+    context = {'page':'Upload'}
+    if request.method == 'POST' and request.FILES.get('zip_file'):
+        username = request.user.username
+        user_path = os.path.join(settings.MEDIA_ROOT, username)
+        dataset_path = os.path.join(settings.MEDIA_ROOT, username, "dataset")
+        augmented_path = os.path.join(settings.MEDIA_ROOT, username, "augmented")
+        temp_path = os.path.join(settings.MEDIA_ROOT, username, "temp")
+        
+        if (not os.path.exists(user_path)):
+            try:
+                os.makedirs(dataset_path)
+                os.makedirs(augmented_path)
+                os.makedirs(temp_path)
+            except Exception as e:
+                print(e)
+                return HttpResponse('Something went wrong')
+
+        # Delete the dataset if it exists
+        if(os.listdir(dataset_path)):
+            try:
+                    # deletes existing dataset
+                    shutil.rmtree(dataset_path)
+                    # creates the folder again
+                    os.mkdir(dataset_path)
+            except Exception as e:
+                    print(e)
+                    return JsonResponse({"message": "Unable to delete existing dataset, please try again"})
+        if dataset:
+            dataset.delete()
+        
+        zip_file = request.FILES['zip_file']
+         
+        try:
+            with ZipFile(zip_file, 'r') as zip_ref:
+                zip_ref.extractall(dataset_path)
+        except Exception as e:
+            print(e)
+            return JsonResponse({"message": "Unable to extract .zip file. Check if you uploaded a valid file."})
+
+        new_dataset = Dataset(user=user, name=zip_file)
+        new_dataset.save()   
+            
+        return JsonResponse({"message": "File uploaded successfully!"})
+    
+    if(dataset):
+        context['hasDataset']=True
+    
+    return render(request, 'photos/add.html', context)
 
 
 
@@ -71,7 +194,6 @@ def selectAugmentations(request):
         if(not randAugment[0] or not randAugment[1]):
             randAugment=(2, 9)
 
-        
         solarizeRange=(int(solarizeRange[0]), int(solarizeRange[1]))
         posterizeRange=int(posterizeRange)
         translatexRange=(int(translatexRange[0])/100, int(translatexRange[1])/100)
@@ -113,7 +235,6 @@ def augment(request):
     augmentations=unescape(request.POST.getlist('augmentations')[0])
     # evaluate the string as list
     augmentations=literal_eval(augmentations)
-    print(augmentations)
 
     ranges=request.POST.getlist('ranges')
 
@@ -194,85 +315,7 @@ def augment(request):
         return JsonResponse({"message": "An error occured, likely because a previous augmentation process was still running. Please wait a minute and try starting a new augmentation."})
     return JsonResponse({'message': "Succesfully augmented the dataset, your download will begin shortly..."})
 
-def registerPage(request):
-    form=CreateUserForm()
 
-    if request.method=='POST':
-        form = CreateUserForm(request.POST)
-        if form.is_valid():
-            form.save()
-            
-            #Creating folders for each registered user
-            dataset_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "dataset")
-            augmented_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "augmented")
-            temp_path = os.path.join(settings.MEDIA_ROOT, request.POST.get('username'), "temp")
-            try:
-                os.makedirs(dataset_path)
-                os.makedirs(augmented_path)
-                os.makedirs(temp_path)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    print(e)
-                    pass
-                else:
-                    print(e)
-            
-            user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password1'))
-        
-            if user is not None:
-                login(request, user)
-                return redirect("gallery")
-
-    context={'page':'Register','form':form}
-
-    return render(request, "photos/register.html", context)
-
-def loginPage(request):
-    if request.method=="POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            return redirect("gallery")
-        else:
-            context={'page':'Login', 'error_message': 'Username or password entered was incorrect'}
-            return render(request, "photos/login.html", context)
-
-    context={'page':'Login'}
-    return render(request, "photos/login.html", context)
-
-def logoutUser(request):
-    logout(request)
-    return redirect('gallery')
-
-def gallery(request):
-    if request.user.is_authenticated==False:
-        context = {'page':'Home', 'user': None}
-        return render(request, 'photos/gallery.html', context)
-    
-    print(request.user)
-    user = User.objects.get(username=request.user)
-    try:
-        dataset = user.dataset  # 'dataset' is the related name defined in the OneToOneField
-        datasetName = dataset.name
-        creationDate = dataset.creationDate
-    except Dataset.DoesNotExist:
-        # The dataset does not exist for this user
-        datasetName = None
-        creationDate = None
-    
-    context = {'page':'Home', 'user': request.user, 'creationDate': creationDate, 'datasetName': datasetName}
-    return render(request, 'photos/gallery.html', context)
-
-@login_required
-def download(request):
-    filename = request.GET.get('filename')
-    if filename:
-        # Return a FileResponse containing the contents of the temporary file
-        return FileResponse(open(filename, 'rb'), as_attachment=True, filename='dataset.zip')
-    return HttpResponseBadRequest()
 
 def zip_folder_thread(queue, folder_path, output_path):
     zip_file = tempfile.NamedTemporaryFile(delete=False, dir=output_path)
@@ -285,6 +328,8 @@ def zip_folder_thread(queue, folder_path, output_path):
     
     zip_file.close()
     queue.put(name)
+
+
 
 @login_required
 def viewPhoto(request):
@@ -310,110 +355,17 @@ def viewPhoto(request):
             # Return a JSON response containing the URL to the temporary file
             return JsonResponse({'url': filename})
     return render(request, 'photos/photo.html', context)
-    
-    # folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test')
-    # if not os.path.exists(folder_path):
-    #     return HttpResponse('Folder not found')
 
-    # file_name = 'my_folder.zip'
-    # zip_buffer = BytesIO()
-
-    # with ZipFile(zip_buffer, 'w') as zip_file:
-    #     for root, dirs, files in os.walk(folder_path):
-    #         for file in files:
-    #             file_path = os.path.join(root, file)
-    #             zip_file.write(file_path, os.path.relpath(file_path, folder_path))
-
-    # zip_buffer.seek(0)
-    # # Get the size of the zip file
-    # zip_size = zip_buffer.getbuffer().nbytes
-
-    # # Create an HTTP response with the zip file as an attachment
-    # response = HttpResponse(zip_buffer, content_type='application/zip')
-    # response['Content-Disposition'] = 'attachment; filename="{}"'.format(file_name)
-
-    # # Set the Content-Length header based on the size of the zip file
-    # response['Content-Length'] = str(zip_size)
-    
-    
-    # print("here")
-    # # Return the HTTP response to the user
-    # return response
-
-    #old photo
-    #augmentedPhotos=[]
-    #photo = Photo.objects.get(id=pk)
-    # if request.method == 'POST':
-    #     photourl=os.path.normpath("..\\static"+photo.image.url)
-    #     print(photourl)
-    #     url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
-    #     img = cv.imread(url)
-    #     seq = iaa.Sequential([
-    #         iaa.TranslateX(percent=(-0.2, 0.2)),
-    #         iaa.ShearX((-20, 20)),
-    #         iaa.ShearY((-20, 20))
-    #     ])
-    #     images=np.array([img, img, img])
-    #     photos=seq(images=images)
-    #     for photo in photos:
-    #         jpgphoto = cv.imencode('.jpg', photo)[1]
-    #         encoded=str(base64.b64encode(jpgphoto), "utf-8")
-    #         augmentedPhotos.append(encoded)
-
-
-    # context = {'photo': photo, 'augmentedPhotos': augmentedPhotos}
-    # return render(request, 'photos/photo.html', context)
-    
-@login_required
-def unzip_file(zip_file_path, extract_dir):
-    with ZipFile(zip_file_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_dir)
 
 
 @login_required
-def addPhoto(request):
-    user_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
-    user = User.objects.get(username=request.user)
-    try:
-        dataset = user.dataset
-    except Dataset.DoesNotExist:
-        dataset = None
-    
-    context = {'page':'Upload'}
-    if request.method == 'POST' and request.FILES.get('zip_file'):
+def download(request):
+    filename = request.GET.get('filename')
+    if filename:
+        # Return a FileResponse containing the contents of the temporary file
+        return FileResponse(open(filename, 'rb'), as_attachment=True, filename='dataset.zip')
+    return HttpResponseBadRequest()
 
-        # Delete the dataset if it exists
-        if dataset:
-            dataset.delete()
-        
-        zip_file = request.FILES['zip_file']
-        new_dataset = Dataset(user=user, name=zip_file)
-        new_dataset.save()
-
-        if(os.listdir(user_path)):
-            # deletes existing dataset
-            shutil.rmtree(user_path)
-            # creates the folder again
-            try:
-                    os.mkdir(user_path)
-            except OSError as e:
-                if e.errno != errno.EEXIST:
-                    pass
-                else:
-                    print(e)
-        
-        
-        
-        with ZipFile(zip_file, 'r') as zip_ref:
-            zip_ref.extractall(user_path)
-
-            
-        return JsonResponse({"message": "File uploaded successfully"})
-    
-    if(dataset):
-        context['hasDataset']=True
-    
-    return render(request, 'photos/add.html', context)
 
 @login_required
 def deleteDataset(request):
@@ -433,16 +385,19 @@ def deleteDataset(request):
         augmented_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented")
         temp_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "temp")
         
-        shutil.rmtree(user_path)
+        try:
+            if(os.path.exists(user_path)):
+                shutil.rmtree(user_path)
+        except Exception as e:
+            print(e)
+            return HttpResponse("Unable to delete dataset")
+
         try:
             os.makedirs(dataset_path)
             os.makedirs(augmented_path)
             os.makedirs(temp_path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                print(e)
-                pass
-            else:
-                print(e)
+        except Exception as e:
+            print(e)
+            return HttpResponse("Unable to create user directories")
 
         return redirect('gallery')
