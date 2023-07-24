@@ -7,30 +7,24 @@
 
 {% block content %}
 
-
-
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col">
-                <a href="{% url 'gallery' %}" class="btn btn-outline-dark m-1">Go back</a>
-                <h2>Augmented photo</h2>
-                <div id="loading-message" style="display:none;">Please wait while the image is being processed...</div>
-                <div id="spinner" class="spinner-border text-secondary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <img id="processed-image" src="" alt="Processed Image">
-
-                <div id="download-message" style="display:none;">Your download will begin shortly...</div>
-                
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col col-md-6">
+            <a href="{% url 'gallery' %}" class="btn btn-outline-dark m-1">Go back</a>
+            <h2>Augmenting images</h2>
+            <div id="loading-message" style="display:none;">Please wait while the images are being processed...</div>
+            <div id="spinner" class="spinner-border text-secondary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
+            
         </div>
     </div>
-    
-    <script>
+</div>
+
+<script>
+    $('#loading-message').show();
+    $('#download-message').hide();
     $(document).ready(function() {
-        $('#loading-message').show();
-        $('#download-message').hide();
-        $('#processed-image').hide();
         $.ajax({
             type: 'POST',
             url: '{% url "process_image" %}',
@@ -43,11 +37,7 @@
             },
             success: function(data) {
                 console.log(data)
-                $('#loading-message').hide();
-                $('#spinner').hide();
-                // $('#processed-image').attr('src', "data:image/jpeg; base64,"+ data.url);
-                // $('#processed-image').show();
-                $('#download-message').show();
+                $('#loading-message').html(data["message"]);
                 // Make an AJAX request to the server to create the zip file
                 $.ajax({
                     url: '/photo/',
@@ -57,8 +47,9 @@
                     }, 
                     success: function(data) {
                         // Redirect the user to the download URL
-                        window.location.href = '/download?filename=' + data.url;
-                        $('#download-message').hide();
+                        window.location.href = '/download?filename=' + data.url; 
+                        $('#spinner').hide();
+                        $('#loading-message').html("Download started!");
                     },
                     error: function(xhr, status, error) {
                     console.log('Error:', error);
@@ -68,5 +59,5 @@
         });
 
     });
-    </script>
+</script>
 {% endblock content %}

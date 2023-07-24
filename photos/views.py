@@ -17,7 +17,6 @@ from zipfile import ZipFile
 from io import BytesIO
 from queue import Queue
 from PIL import Image
-import glob
 import threading
 import time
 import os, shutil, errno
@@ -43,9 +42,9 @@ def selectAugmentations(request):
         shearxRange=(request.POST.get('min4'), request.POST.get('max4'))
         shearyRange=(request.POST.get('min5'), request.POST.get('max5'))
         rotateRange=(request.POST.get('min8'), request.POST.get('max8'))
+        randAugment=(request.POST.get('min9'), request.POST.get('max9'))
 
         numberOfImages=request.POST.get('imageRange')
-        print(numberOfImages)
 
         # if either is empty set to default values
         if(not solarizeRange[0] or not solarizeRange[1]):
@@ -68,6 +67,9 @@ def selectAugmentations(request):
 
         if(not rotateRange[0] or not rotateRange[1]):
             rotateRange=(-45, 45)
+        
+        if(not randAugment[0] or not randAugment[1]):
+            randAugment=(2, 9)
 
         
         solarizeRange=(int(solarizeRange[0]), int(solarizeRange[1]))
@@ -77,8 +79,9 @@ def selectAugmentations(request):
         shearxRange=(int(shearxRange[0]), int(shearxRange[1]))
         shearyRange=(int(shearyRange[0]), int(shearyRange[1]))
         rotateRange=(int(rotateRange[0]), int(rotateRange[1]))
+        randAugment=(int(randAugment[0]), int(randAugment[1]))
 
-        ranges=[solarizeRange, posterizeRange, translatexRange, translateyRange, shearxRange, shearyRange, rotateRange]
+        ranges=[solarizeRange, posterizeRange, translatexRange, translateyRange, shearxRange, shearyRange, rotateRange, randAugment]
         if(premade):
             premade=True
         else:
@@ -89,13 +92,17 @@ def selectAugmentations(request):
                     'ranges': ranges,
                     'numberOfImages': numberOfImages}
         return render(request, 'photos/photo.html', context)
-    user_path = os.path.join(settings.MEDIA_ROOT, request.user.username)
 
-    if( not(os.listdir(user_path))):
-        print("is empty")
+    user = User.objects.get(username=request.user)
+    try:
+        dataset = user.dataset
+    except Dataset.DoesNotExist:
+        dataset = None
+
+    if(not dataset):
         context['hasDataset']=False
 
-    items = ["0","1","2","3","4","5","6","7","8"]
+    items = ["0","1","2","3","4","5","6","7","8","9"]
     context['list']=items
     return render(request, "photos/augment.html", context)
 
@@ -115,10 +122,13 @@ def augment(request):
     print(ranges)
 
     numberOfImages=int(request.POST.get('numberOfImages'))
-    print(numberOfImages)
+    print("num: ", numberOfImages)
+    print("user: ", request.user)
+    
     augmenters=[]
     if(premade=="True"):
-        augmenters.append(iaa.RandAugment(n=1, m=9))
+        augmenters.append(iaa.RandAugment(ranges[7][0], ranges[7][1]))
+        print("RandAugment")
     else:
         for augmentation in augmentations:
             match (augmentation):
@@ -134,7 +144,6 @@ def augment(request):
                 case 'translatey':
                     augmenters.append(iaa.TranslateY(percent=ranges[3]))
                     print(augmentation)
-                # iaa.Crop(percent=(0, 0.2))
                 case 'shearx':
                     augmenters.append(iaa.ShearX(ranges[4])) #degrees
                     print(augmentation)
@@ -155,40 +164,35 @@ def augment(request):
 
     
     seq = iaa.Sequential(augmenters)
-    # photourl=os.path.normpath("..\\static"+"\\images\\tree_FD89IFe.jpg")
-    # url=os.path.normpath(os.path.join(settings.PROJECT_ROOT, photourl))
-    # img = cv.imread(url)
-    
-    # images=np.array([img, img, img])
-    # photos=seq(images=images)
-    # for photo in photos:
-    #     jpgphoto = cv.imencode('.jpg', photo)[1]
-    #     encoded=str(base64.b64encode(jpgphoto), "utf-8")
-    #     augmentedPhotos.append(encoded)
     dataset_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
     augmented_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented")
-    shutil.rmtree(augmented_folder)
-    shutil.copytree(dataset_folder, augmented_folder)
+    try:
+        shutil.rmtree(augmented_folder)
+        shutil.copytree(dataset_folder, augmented_folder)
 
-    for subdir, dirs, files in os.walk(augmented_folder):
-        for file in files:
-            # Create the full file path
-            file_path = os.path.join(subdir, file)
+        for subdir, dirs, files in os.walk(augmented_folder):
+            for file in files:
+                # Create the full file path
+                file_path = os.path.join(subdir, file)
 
-            # Check if the file is an image (optional)
-            if file.endswith('.jpg') or file.endswith('.png'):
-                # Open the image using PIL
-                image =np.array( Image.open(file_path))
-                
-                for i in range(numberOfImages):
-                    # Apply the augmentations
+                # Check if the file is an image (optional)
+                if file.endswith('.jpg') or file.endswith('.png'):
+                    # Open the image using PIL
+                    image =np.array( Image.open(file_path))
                     
-                    augmented_image = seq.augment_image(image)
-                    augmented_image_pil = Image.fromarray(augmented_image)
-                    # Save the augmented image in the same directory
-                    augmented_file_path = os.path.join(subdir, f"augmented_{i}{file}")
-                    augmented_image_pil.save(augmented_file_path, format='PNG')
-    return JsonResponse({'url': "aaa"})
+                    for i in range(numberOfImages):
+                        # Apply the augmentations
+                        
+                        augmented_image = seq.augment_image(image)
+                        augmented_image_pil = Image.fromarray(augmented_image)
+                        # Save the augmented image in the same directory
+                        augmented_file_path = os.path.join(subdir, f"augmented_{i}{file}")
+                        augmented_image_pil.save(augmented_file_path, format='PNG')
+    except Exception as e:
+        print(f"An exception occurred: {e}")
+
+        return JsonResponse({"message": "An error occured, likely because a previous augmentation process was still running. Please wait a minute and try starting a new augmentation."})
+    return JsonResponse({'message': "Succesfully augmented the dataset, your download will begin shortly..."})
 
 def registerPage(request):
     form=CreateUserForm()
@@ -258,16 +262,11 @@ def gallery(request):
         # The dataset does not exist for this user
         datasetName = None
         creationDate = None
-    print(datasetName, creationDate)
-    category = request.GET.get('category')
-    categories = Category.objects.all
-    if category==None:
-        photos = Photo.objects.all
-    else:
-        photos=Photo.objects.filter(category__name=category)
+    
     context = {'page':'Home', 'user': request.user, 'creationDate': creationDate, 'datasetName': datasetName}
     return render(request, 'photos/gallery.html', context)
 
+@login_required
 def download(request):
     filename = request.GET.get('filename')
     if filename:
@@ -374,44 +373,44 @@ def unzip_file(zip_file_path, extract_dir):
 @login_required
 def addPhoto(request):
     user_path = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
+    user = User.objects.get(username=request.user)
+    try:
+        dataset = user.dataset
+    except Dataset.DoesNotExist:
+        dataset = None
+    
     context = {'page':'Upload'}
     if request.method == 'POST' and request.FILES.get('zip_file'):
-        if (request.user.is_authenticated):
-            user = User.objects.get(username=request.user)
+
+        # Delete the dataset if it exists
+        if dataset:
+            dataset.delete()
+        
+        zip_file = request.FILES['zip_file']
+        new_dataset = Dataset(user=user, name=zip_file)
+        new_dataset.save()
+
+        if(os.listdir(user_path)):
+            # deletes existing dataset
+            shutil.rmtree(user_path)
+            # creates the folder again
             try:
-                dataset = user.dataset
-            except Dataset.DoesNotExist:
-                dataset = None
-
-            # Delete the dataset if it exists
-            if dataset:
-                dataset.delete()
-            
-            zip_file = request.FILES['zip_file']
-            new_dataset = Dataset(user=user, name=zip_file)
-            new_dataset.save()
-
-            if(os.listdir(user_path)):
-                # deletes existing dataset
-                shutil.rmtree(user_path)
-                # creates the folder again
-                try:
-                        os.mkdir(user_path)
-                except OSError as e:
-                    if e.errno != errno.EEXIST:
-                        pass
-                    else:
-                        print(e)
-            
-            
-            
-            with ZipFile(zip_file, 'r') as zip_ref:
-                zip_ref.extractall(user_path)
+                    os.mkdir(user_path)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    pass
+                else:
+                    print(e)
+        
+        
+        
+        with ZipFile(zip_file, 'r') as zip_ref:
+            zip_ref.extractall(user_path)
 
             
         return JsonResponse({"message": "File uploaded successfully"})
     
-    if(os.listdir(user_path)):
+    if(dataset):
         context['hasDataset']=True
     
     return render(request, 'photos/add.html', context)
@@ -447,47 +446,3 @@ def deleteDataset(request):
                 print(e)
 
         return redirect('gallery')
-
-    
-    
-
-
-
-    # WIP
-    # if request.method == 'POST':
-    #     form = request.POST
-    #     directory_name = form['dir_name']
-    #     print(directory_name)
-    #     # os.mkdir(os.path.join(settings.PROJECT_ROOT, "..", "dynamic/", directory_name))
-    #     files =  request.FILES.getlist('images')
-    #     print(files)
-    # context = {'page':'add'}
-    # return render(request, 'photos/add.html', context)
-
-
-
-    # categories = Category.objects.all
-
-    # if request.method == 'POST':
-    #     data = request.POST
-    #     images =  request.FILES.getlist('images')
-    #     print(images)
-        
-    #     if data['category'] != 'null':
-    #         category = Category.objects.get(id=data['category'])
-    #     elif data['category-new'] != '':
-    #         category, created = Category.objects.get_or_create(name = data['category-new'])
-    #     else:
-    #         category = None
-        
-    #     for image in images:
-    #         photo=Photo.objects.create(
-    #             category=category,
-    #             description=data['description'],
-    #             image=image
-    #         )
-        
-    #     return redirect('gallery')
-
-    # context = {'page':'add', 'categories' : categories}
-    # return render(request, 'photos/add.html', context)

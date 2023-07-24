@@ -7,6 +7,17 @@
 
 {% block content %}
     <style>
+        #warning-img {
+            height: 20px;
+            margin-bottom: 5px;
+        }
+        .warning{
+            background-color: lightgoldenrodyellow;
+        }
+        button:disabled {
+            cursor: not-allowed;
+            pointer-events: all !important;
+        }
         .links{
             color: inherit;
             text-decoration: inherit;
@@ -27,30 +38,40 @@
         .input-group-text, input[type='number'] {
             height: 30px;
         }
-        .preview{
-            min-height: 180px;
+        .info{
+            height: 30px;
+            margin-left: 20px;
         }
+        .preview{
+            min-height: 200px;
+            max-width: 600px;
+        }
+        
 
     </style>
 
     <div class="container mycont mt-5">
-        
-            <div class="row">
-            <div class="col-sm-5 order-sm-2 preview">
+        <div class="row">
+            <div class="col">
+                {% if hasDataset is False %}
+                <div class="warning mb-3">
+                    <img id="warning-img" class="float-left" src="{% static 'warning.png' %}" alt="Dataset warning">
+                    You don't have an uploaded dataset. Please upload one to enable augmentation.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5 order-md-2 preview">
                 <h2 id="mouseover">Mouseover for a preview</h2>
                 
                 {% for item in list %}
                     {% with "preview"|add:item|add:".png" as url %}
-                    <img alt="preview image" class="img-fluid" id="img{{ forloop.counter0 }}" src="{% static url %}">
+                    <img alt="preview image" style="display: none;" class="img-fluid" id="img{{ forloop.counter0 }}" src="{% static url %}">
                     {% endwith %}
                 {% endfor %}
             </div>
-            <div class="col-sm-7 order-sm-1">
-                {% if hasDataset is False %}
-                    <div class="mb-3">
-                        You don't have an uploaded dataset, go upload one.
-                    </div>
-                {% endif %}
+            <div class="col-md-7 order-md-1">
                 <div class="card my-2">
                     <div class="card-header">
                         Select augmentation
@@ -70,22 +91,10 @@
                                             <li class="list-group-item mx-3">
                                                 <a class="links" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapseExample">Color augmentations</a>
                                                 <div class="collapse" id="collapse1">
-                                                    <div class="m-3" >
-                                                        <!-- <div class="form-check" id="0" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="solarize" id="custom0">
-                                                            <label class="form-check-label" for="custom0">
-                                                            Solarize
-                                                            </label>
-                                                        </div> -->
-                                                        <!-- <div class="form-check" id="1" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                            <input name="augmentations" class="form-check-input" type="checkbox" value="posterize" id="custom1">
-                                                            <label class="form-check-label" for="custom1">
-                                                            Posterize
-                                                            </label>
-                                                        </div> -->
+                                                    <div class="m-3">
                                                         <div class="container mt-3">
                                                             <div class="row">
-                                                                <div class="col-md-3">
+                                                                <div class="col-md-3" >
                                                                     <div class="form-check"  id="0" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
                                                                     <input name="augmentations" value="solarize" class="form-check-input" type="checkbox" id="custom0">
                                                                     <label class="form-check-label" for="custom0">Solarize</label>
@@ -94,17 +103,20 @@
                                                                 <div class="col-md-9">
                                                                     <div id="range0" style="visibility: hidden;">
                                                                         <div class="row g-2">
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="0 to 255, lower means more pixels inverted">
                                                                                     <label for="min0" class="input-group-text">Min:</label>
-                                                                                    <input name="min0" type="number" class="form-control" id="min0" min="0" max="255">
+                                                                                    <input name="min0" type="number" class="form-control" id="min0" min="0" max="255" value="32">
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="0 to 255, lower means more pixels inverted">
                                                                                     <label for="max0" class="input-group-text">Max:</label>
-                                                                                    <input name="max0" type="number" class="form-control" id="max0" min="0" max="255">
+                                                                                    <input name="max0" type="number" class="form-control" id="max0" min="0" max="255" value="128">
                                                                                 </div>
+                                                                            </div>
+                                                                            <div class="col-2">
+                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Solarize inverts the colors of pixels above a threshold. Solarize randomly applies a threshold value within the specified range to each image.">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -122,11 +134,14 @@
                                                                 <div class="col-md-9">
                                                                     <div id="range1" style="visibility: hidden;">
                                                                         <div class="row g-2">
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-10">
+                                                                                <div class="input-group tt" title="1 to 8, lower means fewer color level">
                                                                                     <label for="min1" class="input-group-text">Bits:</label>
-                                                                                    <input name="min1" type="number" class="form-control" id="min1" min="1" max="8">
+                                                                                    <input name="min1" type="number" class="form-control" id="min1" min="1" max="8" value="3">
                                                                                 </div>
+                                                                            </div>
+                                                                            <div class="col-2">
+                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Reduce the number of color levels in an image, resulting in a poster-like effect with fewer color tones. Enter the number of bits.">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -136,8 +151,6 @@
                                                     </div>
                                                 </div>
                                             </li>
-                                            
-                                            
                                             <li class="list-group-item mx-3">
                                                 <a class="links" data-bs-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapseExample">Affine augmentations</a>
                                                 <div class="collapse" id="collapse2">
@@ -153,17 +166,20 @@
                                                                 <div class="col-md-9">
                                                                     <div id="range2" style="visibility: hidden;">
                                                                         <div class="row g-2">
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="-100 to 100, % of image width">
                                                                                     <label for="min2" class="input-group-text">Min:</label>
-                                                                                    <input name="min2" type="number" class="form-control" id="min2" min="-100" max="100">
+                                                                                    <input name="min2" type="number" class="form-control" id="min2" min="-100" max="100" value="-20">
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="-100 to 100, % of image width">
                                                                                     <label for="max2" class="input-group-text">Max:</label>
-                                                                                    <input name="max2" type="number" class="form-control" id="max2" min="-100" max="100">
+                                                                                    <input name="max2" type="number" class="form-control" id="max2" min="-100" max="100" value="20">
                                                                                 </div>
+                                                                            </div>
+                                                                            <div class="col-2">
+                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Shifts the image horizontally by random percentage within the specified range.">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -181,17 +197,20 @@
                                                                 <div class="col-md-9">
                                                                     <div id="range3" style="visibility: hidden;">
                                                                         <div class="row g-2">
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
                                                                                     <label for="min3" class="input-group-text">Min:</label>
-                                                                                    <input name="min3" type="number" class="form-control" id="min3" min="0" max="100">
+                                                                                    <input name="min3" type="number" class="form-control" id="min3" min="-100" max="100" value="-20">
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
                                                                                     <label for="max3" class="input-group-text">Max:</label>
-                                                                                    <input name="max3" type="number" class="form-control" id="max3" min="0" max="100">
+                                                                                    <input name="max3" type="number" class="form-control" id="max3" min="-100" max="100" value="20">
                                                                                 </div>
+                                                                            </div>
+                                                                            <div class="col-2">
+                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Shifts the image vertically by random percentage within the specified range.">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -209,17 +228,20 @@
                                                                 <div class="col-md-9">
                                                                     <div id="range4" style="visibility: hidden;">
                                                                         <div class="row g-2">
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="-100 to 100, % of image width">
                                                                                     <label for="min4" class="input-group-text">Min:</label>
-                                                                                    <input name="min4" type="number" class="form-control" id="min4" min="0" max="100">
+                                                                                    <input name="min4" type="number" class="form-control" id="min4" min="-100" max="100" value="-20">
+                                                                                </div> 
+                                                                            </div> 
+                                                                            <div class="col-5"> 
+                                                                                <div class="input-group tt" title="-100 to 100, % of image width"> 
+                                                                                    <label for="max4" class="input-group-text">Max:</label> 
+                                                                                    <input name="max4" type="number" class="form-control" id="max4" min="-100" max="100" value="20">
                                                                                 </div>
                                                                             </div>
-                                                                            <div class="col">
-                                                                                <div class="input-group">
-                                                                                    <label for="max4" class="input-group-text">Max:</label>
-                                                                                    <input name="max4" type="number" class="form-control" id="max4" min="0" max="100">
-                                                                                </div>
+                                                                            <div class="col-2">
+                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Skews the image horizontally by random percentage within the specified range.">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -237,17 +259,51 @@
                                                                 <div class="col-md-9">
                                                                     <div id="range5" style="visibility: hidden;">
                                                                         <div class="row g-2">
-                                                                            <div class="col">
-                                                                                <div class="input-group">
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
                                                                                     <label for="min5" class="input-group-text">Min:</label>
-                                                                                    <input name="min5" type="number" class="form-control" id="min5" min="0" max="100">
+                                                                                    <input name="min5" type="number" class="form-control" id="min5" min="-100" max="100" value="-20">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-5">
+                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
+                                                                                    <label for="max5" class="input-group-text">Max:</label>
+                                                                                    <input name="max5" type="number" class="form-control" id="max5" min="-100" max="100" value="20">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-2">
+                                                                                <img class="info tt" src="{% static 'info.png' %} " title="Skews the image vertically by random percentage within the specified range.">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="container mt-3">
+                                                            <div class="row">
+                                                                <div class="col-md-3">
+                                                                    <div class="form-check"  id="8" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                                    <input name="augmentations" value="rotate" class="form-check-input" type="checkbox" id="custom8">
+                                                                    <label class="form-check-label" for="custom8">Rotate</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-9">
+                                                                    <div id="range8" style="visibility: hidden;">
+                                                                        <div class="row g-2">
+                                                                            <div class="col">
+                                                                                <div class="input-group tt" title="-180 to 180, angle in degrees">
+                                                                                    <label for="min8" class="input-group-text">Min:</label>
+                                                                                    <input name="min8" type="number" class="form-control" id="min8" min="-180" max="180" value="-45">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col">
-                                                                                <div class="input-group">
-                                                                                    <label for="max5" class="input-group-text">Max:</label>
-                                                                                    <input name="max5" type="number" class="form-control" id="max5" min="0" max="100">
+                                                                                <div class="input-group tt" title="-180 to 180, angle in degrees">
+                                                                                    <label for="max8" class="input-group-text">Max:</label>
+                                                                                    <input name="max8" type="number" class="form-control" id="max8" min="-180" max="180" value="45">
                                                                                 </div>
+                                                                            </div>
+                                                                            <div class="col-2">
+                                                                                <img class="info tt" alt="info" src="{% static 'info.png' %} " title="Rotates the image by a random angle within the specified range.">
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -258,7 +314,7 @@
                                                 </div>
                                             </li>
                                             <li class="list-group-item mx-3">
-                                                <a class="links" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapseExample">Flip and rotate augmentations</a>
+                                                <a class="links" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapseExample">Flip augmentations</a>
                                                 <div class="collapse" id="collapse3">
                                                     <div class="m-3" >
                                                         <div class="container mt-3">
@@ -281,34 +337,6 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="container mt-3">
-                                                            <div class="row">
-                                                                <div class="col-md-3">
-                                                                    <div class="form-check"  id="8" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
-                                                                    <input name="augmentations" value="rotate" class="form-check-input" type="checkbox" id="custom8">
-                                                                    <label class="form-check-label" for="custom8">Rotate</label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-9">
-                                                                    <div id="range8" style="visibility: hidden;">
-                                                                        <div class="row g-2">
-                                                                            <div class="col">
-                                                                                <div class="input-group">
-                                                                                    <label for="min8" class="input-group-text">Min:</label>
-                                                                                    <input name="min8" type="number" class="form-control" id="min8" min="-180" max="180">
-                                                                                </div>
-                                                                            </div>
-                                                                            <div class="col">
-                                                                                <div class="input-group">
-                                                                                    <label for="max8" class="input-group-text">Max:</label>
-                                                                                    <input name="max8" type="number" class="form-control" id="max8" min="-180" max="180">
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </li>
@@ -325,16 +353,41 @@
                                 <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
                                     <div class="accordion-body">
                                         <div class="m-3">
-                                            <div class="form-check form-switch">
-                                                <input name="premade" class="form-check-input" type="checkbox" role="switch" id="premade" onclick="premadeCheck()">
-                                                <label class="form-check-label" for="premade">RandAugment</label>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-check form-switch" id="9" onmouseover="mouseover(this.id)" onmouseout="mouseout(this.id)">
+                                                        <input name="premade" class="form-check-input" type="checkbox" role="switch" id="premade" onclick="premadeCheck()">
+                                                        <label class="form-check-label" for="premade">RandAugment</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div id="range9" style="visibility: hidden;">
+                                                        <div class="row g-2">
+                                                            <div class="col">
+                                                                <div class="input-group tt" title="1 to 14, number of augmentations applied">
+                                                                    <label for="min9" class="input-group-text">N:</label>
+                                                                    <input name="min9" type="number" class="form-control" min="1" max="13" value="2">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="input-group tt" title="1 to 30, magnitude of the augmentation. Higher magnitude means stronger augmentation">
+                                                                    <label for="max9" class="input-group-text">M:</label>
+                                                                    <input name="max9" type="number" class="form-control" min="1" max="30" value="9">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-2">
+                                                                <img class="info tt" alt="info" src="{% static 'info.png' %} " title="RandAugment is a data augmentation technique that randomly applies a sequence of transformations with a specified magnitude.">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="input-group p-3">
+                            <div class="input-group p-2">
                                 <label for="imageRange" class="form-label">Select the number of augmented images:</label>
                                 <input id="imageRange" name="imageRange" type="range" class="form-range" value="1" min="1" max="15" oninput="this.nextElementSibling.innerHTML = this.value">
                                 <output>1</output>
@@ -342,12 +395,12 @@
                             
                         </div>
                         <div class="p-1">
+                            {% if hasDataset is False %}
+                            <button type="submit" class='btn btn-dark col-12' disabled="true">Augment</button>
+                            {% else %}
                             <button type="submit" class='btn btn-dark col-12'>Augment</button>
+                            {% endif %}
                         </div>
-
-                        <button type="button" class="btn btn-secondary tt" title="Tooltip on top">
-                            Tooltip on top
-                        </button>
                     </form>    
                 </div>
             </div>
@@ -357,13 +410,17 @@
 
     
       <script>
+        // add tooltips
         const tooltipTriggerList = document.querySelectorAll('.tt')
         tooltipTriggerList.forEach(t => {
             new bootstrap.Tooltip(t);
         })
+
+        // show range input when checkbox is checked
         $(document).ready(function() {
-            $('input:checkbox[id^="custom"]').change(function() {
-                if (this.checked) {
+            
+            $('input:checkbox').change(function() {
+                if ($(this).is(':checked')) {
                 $('#range'+this.parentNode.id).css('visibility','visible');
                 } else {
                 $('#range'+this.parentNode.id).css('visibility','hidden');
@@ -372,6 +429,7 @@
 
             let elementsArray = document.querySelectorAll('input[id^="m"]');
 
+            // let users enter only integers
             elementsArray.forEach(function(elem) {
                 elem.addEventListener("keydown", function(event) {
                     if (event.key === "." || event.key === "Decimal" || event.key=== "e") {
@@ -380,26 +438,13 @@
                 });
             });
             
-            // .addEventListener("keydown", function(event) {
-            //     if (event.key === "." || event.key === "Decimal" || event.key=== "e") {
-            //         event.preventDefault();
-            //     }
-            // });
         });
 
+        var flag = 1; //are checkboxes enabled
+
         
-      </script>
-    
-
-    <script>
-         var flag = 1; //are checkboxes enabled
-        
-
-        for(var i=0;i<=8;i++){
-            $("#img"+i).hide();
-        }
-
         function premadeCheck(){
+            // disables checkboxes and their ranges if premade is selected
             if(flag){
                 $('input:checkbox[id^="custom"]').prop("disabled", true);
                 $('input[id^="m"]').prop("disabled", true)
