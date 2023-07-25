@@ -19,10 +19,10 @@ import numpy as np
 import tempfile
 
 
-def gallery(request):
+def home(request):
     if request.user.is_authenticated==False:
-        context = {'page':'Home', 'user': None}
-        return render(request, 'photos/gallery.html', context)
+        context = {'page':'Home'}
+        return render(request, 'photos/index.html', context)
     
     user = User.objects.get(username=request.user)
     try:
@@ -34,8 +34,8 @@ def gallery(request):
         datasetName = None
         creationDate = None
     
-    context = {'page':'Home', 'user': request.user, 'creationDate': creationDate, 'datasetName': datasetName}
-    return render(request, 'photos/gallery.html', context)
+    context = {'page':'Home', 'creationDate': creationDate, 'datasetName': datasetName}
+    return render(request, 'photos/index.html', context)
 
 
 def registerPage(request):
@@ -62,7 +62,7 @@ def registerPage(request):
         
             if user is not None:
                 login(request, user)
-                return redirect("gallery")
+                return redirect("home")
 
     context={'page':'Register','form':form}
 
@@ -77,7 +77,7 @@ def loginPage(request):
         
         if user is not None:
             login(request, user)
-            return redirect("gallery")
+            return redirect("home")
         else:
             context={'page':'Login', 'error_message': 'Username or password entered was incorrect'}
             return render(request, "photos/login.html", context)
@@ -88,11 +88,11 @@ def loginPage(request):
 
 def logoutUser(request):
     logout(request)
-    return redirect('gallery')
+    return redirect("home")
 
 
 @login_required
-def addPhoto(request):
+def uploadDataset(request):
     user = User.objects.get(username=request.user)
     try:
         dataset = user.dataset
@@ -100,7 +100,7 @@ def addPhoto(request):
         dataset = None
     
     context = {'page':'Upload'}
-    if request.method == 'POST' and request.FILES.get('zip_file'):
+    if (request.method == 'POST' and request.FILES.get('zip_file')):
         username = request.user.username
         user_path = os.path.join(settings.MEDIA_ROOT, username)
         dataset_path = os.path.join(settings.MEDIA_ROOT, username, "dataset")
@@ -146,7 +146,7 @@ def addPhoto(request):
     if(dataset):
         context['hasDataset']=True
     
-    return render(request, 'photos/add.html', context)
+    return render(request, 'photos/upload.html', context)
 
 
 
@@ -212,8 +212,9 @@ def selectAugmentations(request):
                     'augmentations': augmentations,
                     'premade': premade,
                     'ranges': ranges,
-                    'numberOfImages': numberOfImages}
-        return render(request, 'photos/photo.html', context)
+                    'numberOfImages': numberOfImages,
+                    'augment': True}
+        return render(request, 'photos/download.html', context)
 
     user = User.objects.get(username=request.user)
     try:
@@ -228,92 +229,96 @@ def selectAugmentations(request):
     context['list']=items
     return render(request, "photos/augment.html", context)
 
+
+
 @login_required
-def augment(request):
-    premade=request.POST.getlist('premade')[0]
-    # clean up the string from ajax
-    augmentations=unescape(request.POST.getlist('augmentations')[0])
-    # evaluate the string as list
-    augmentations=literal_eval(augmentations)
+def augmentDataset(request):
+    if(request.method=="POST"):
+        premade=request.POST.getlist('premade')[0]
+        # clean up the string from ajax
+        augmentations=unescape(request.POST.getlist('augmentations')[0])
+        # evaluate the string as list
+        augmentations=literal_eval(augmentations)
 
-    ranges=request.POST.getlist('ranges')
+        ranges=request.POST.getlist('ranges')
 
-    # evaluate the string as list
-    ranges=literal_eval(ranges[0])
-    print(ranges)
+        # evaluate the string as list
+        ranges=literal_eval(ranges[0])
+        print(ranges)
 
-    numberOfImages=int(request.POST.get('numberOfImages'))
-    print("num: ", numberOfImages)
-    print("user: ", request.user)
-    
-    augmenters=[]
-    if(premade=="True"):
-        augmenters.append(iaa.RandAugment(ranges[7][0], ranges[7][1]))
-        print("RandAugment")
-    else:
-        for augmentation in augmentations:
-            match (augmentation):
-                case 'solarize':
-                    augmenters.append(iaa.Solarize(1, threshold=ranges[0]))
-                    print(augmentation)
-                case 'posterize':
-                    augmenters.append(iaa.Posterize(ranges[1]))
-                    print(augmentation)
-                case 'translatex':
-                    augmenters.append(iaa.TranslateX(percent=ranges[2]))
-                    print(augmentation)
-                case 'translatey':
-                    augmenters.append(iaa.TranslateY(percent=ranges[3]))
-                    print(augmentation)
-                case 'shearx':
-                    augmenters.append(iaa.ShearX(ranges[4])) #degrees
-                    print(augmentation)
-                case 'sheary':
-                    augmenters.append(iaa.ShearY(ranges[5])) #degrees
-                    print(augmentation)
-                case 'flipx':
-                    augmenters.append(iaa.Fliplr(1))
-                    print(augmentation)
-                case 'flipy':
-                    augmenters.append(iaa.Flipud(1))
-                    print(augmentation)
-                case 'rotate':
-                    augmenters.append(iaa.Affine(rotate=ranges[6]))
-                    print(augmentation)
-                case _:
-                    print("illegal state")
+        numberOfImages=int(request.POST.get('numberOfImages'))
+        print("num: ", numberOfImages)
+        print("user: ", request.user)
+        
+        augmenters=[]
+        if(premade=="True"):
+            augmenters.append(iaa.RandAugment(ranges[7][0], ranges[7][1]))
+            print("RandAugment")
+        else:
+            for augmentation in augmentations:
+                match (augmentation):
+                    case 'solarize':
+                        augmenters.append(iaa.Solarize(1, threshold=ranges[0]))
+                        print(augmentation)
+                    case 'posterize':
+                        augmenters.append(iaa.Posterize(ranges[1]))
+                        print(augmentation)
+                    case 'translatex':
+                        augmenters.append(iaa.TranslateX(percent=ranges[2]))
+                        print(augmentation)
+                    case 'translatey':
+                        augmenters.append(iaa.TranslateY(percent=ranges[3]))
+                        print(augmentation)
+                    case 'shearx':
+                        augmenters.append(iaa.ShearX(ranges[4])) #degrees
+                        print(augmentation)
+                    case 'sheary':
+                        augmenters.append(iaa.ShearY(ranges[5])) #degrees
+                        print(augmentation)
+                    case 'flipx':
+                        augmenters.append(iaa.Fliplr(1))
+                        print(augmentation)
+                    case 'flipy':
+                        augmenters.append(iaa.Flipud(1))
+                        print(augmentation)
+                    case 'rotate':
+                        augmenters.append(iaa.Affine(rotate=ranges[6]))
+                        print(augmentation)
+                    case _:
+                        print("illegal state")
 
-    
-    seq = iaa.Sequential(augmenters)
-    dataset_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
-    augmented_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented")
-    try:
-        shutil.rmtree(augmented_folder)
-        shutil.copytree(dataset_folder, augmented_folder)
+        
+        seq = iaa.Sequential(augmenters)
+        dataset_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "dataset")
+        augmented_folder = os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented")
+        try:
+            shutil.rmtree(augmented_folder)
+            shutil.copytree(dataset_folder, augmented_folder)
 
-        for subdir, dirs, files in os.walk(augmented_folder):
-            for file in files:
-                # Create the full file path
-                file_path = os.path.join(subdir, file)
+            for subdir, dirs, files in os.walk(augmented_folder):
+                for file in files:
+                    # Create the full file path
+                    file_path = os.path.join(subdir, file)
 
-                # Check if the file is an image (optional)
-                if file.endswith('.jpg') or file.endswith('.png'):
-                    # Open the image using PIL
-                    image =np.array( Image.open(file_path))
-                    
-                    for i in range(numberOfImages):
-                        # Apply the augmentations
+                    # Check if the file is an image (optional)
+                    if file.endswith('.jpg') or file.endswith('.png'):
+                        # Open the image using PIL
+                        image =np.array( Image.open(file_path))
                         
-                        augmented_image = seq.augment_image(image)
-                        augmented_image_pil = Image.fromarray(augmented_image)
-                        # Save the augmented image in the same directory
-                        augmented_file_path = os.path.join(subdir, f"augmented_{i}{file}")
-                        augmented_image_pil.save(augmented_file_path, format='PNG')
-    except Exception as e:
-        print(f"An exception occurred: {e}")
+                        for i in range(numberOfImages):
+                            # Apply the augmentations
+                            
+                            augmented_image = seq.augment_image(image)
+                            augmented_image_pil = Image.fromarray(augmented_image)
+                            # Save the augmented image in the same directory
+                            augmented_file_path = os.path.join(subdir, f"augmented_{i}{file}")
+                            augmented_image_pil.save(augmented_file_path, format='PNG')
+        except Exception as e:
+            print(f"An exception occurred: {e}")
 
-        return JsonResponse({"message": "An error occured, likely because a previous augmentation process was still running. Please wait a minute and try starting a new augmentation."})
-    return JsonResponse({'message': "Succesfully augmented the dataset, your download will begin shortly..."})
+            return JsonResponse({"message": "An error occured, likely because a previous augmentation process was still running. Please wait a minute and try starting a new augmentation."})
+        return JsonResponse({'message': "Succesfully augmented the dataset, your download will begin shortly..."})
+    return redirect("home")
 
 
 
@@ -332,10 +337,8 @@ def zip_folder_thread(queue, folder_path, output_path):
 
 
 @login_required
-def viewPhoto(request):
-    context = {'page':'Augment'}
+def zipDataset(request):
     if request.method == 'POST':
-        
         queue = Queue()
         folder_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username, "augmented"))
         output_path = os.path.normpath(os.path.join(settings.MEDIA_ROOT, request.user.username, "temp"))
@@ -354,7 +357,7 @@ def viewPhoto(request):
             os.mkdir(folder_path)
             # Return a JSON response containing the URL to the temporary file
             return JsonResponse({'url': filename})
-    return render(request, 'photos/photo.html', context)
+    return redirect("home")
 
 
 
@@ -364,7 +367,9 @@ def download(request):
     if filename:
         # Return a FileResponse containing the contents of the temporary file
         return FileResponse(open(filename, 'rb'), as_attachment=True, filename='dataset.zip')
-    return HttpResponseBadRequest()
+    return redirect("home")
+    
+
 
 
 @login_required
@@ -400,4 +405,4 @@ def deleteDataset(request):
             print(e)
             return HttpResponse("Unable to create user directories")
 
-        return redirect('gallery')
+        return redirect("home")

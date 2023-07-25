@@ -56,7 +56,7 @@
                 {% if hasDataset is False %}
                 <div class="warning mb-3">
                     <img id="warning-img" class="float-left" src="{% static 'warning.png' %}" alt="Dataset warning">
-                    You don't have an uploaded dataset. Please <a class="link-dark" href="{% url 'add' %}">upload</a> one to enable augmentation.
+                    You don't have an uploaded dataset. Please <a class="link-dark" href="{% url 'upload' %}">upload</a> one to enable augmentation.
                 </div>
                 {% endif %}
             </div>
@@ -101,16 +101,16 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-9">
-                                                                    <div id="range0" style="visibility: hidden;">
+                                                                    <div id="range0">
                                                                         <div class="row g-2">
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="0 to 255, lower means more pixels inverted">
+                                                                                <div class="input-group range0 tt" style="visibility: hidden;" title="0 to 255, lower means more pixels inverted">
                                                                                     <label for="min0" class="input-group-text">Min:</label>
                                                                                     <input name="min0" type="number" class="form-control" id="min0" min="0" max="255" value="32">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="0 to 255, lower means more pixels inverted">
+                                                                                <div class="input-group range0 tt" style="visibility: hidden;" title="0 to 255, lower means more pixels inverted">
                                                                                     <label for="max0" class="input-group-text">Max:</label>
                                                                                     <input name="max0" type="number" class="form-control" id="max0" min="0" max="255" value="128">
                                                                                 </div>
@@ -132,10 +132,10 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-9">
-                                                                    <div id="range1" style="visibility: hidden;">
+                                                                    <div id="range1">
                                                                         <div class="row g-2">
                                                                             <div class="col-10">
-                                                                                <div class="input-group tt" title="1 to 8, lower means fewer color level">
+                                                                                <div class="input-group range1 tt" style="visibility: hidden;" title="1 to 8, lower means fewer color level">
                                                                                     <label for="min1" class="input-group-text">Bits:</label>
                                                                                     <input name="min1" type="number" class="form-control" id="min1" min="1" max="8" value="3">
                                                                                 </div>
@@ -164,16 +164,16 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-9">
-                                                                    <div id="range2" style="visibility: hidden;">
+                                                                    <div id="range2">
                                                                         <div class="row g-2">
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="-100 to 100, % of image width">
+                                                                                <div class="input-group range2 tt" style="visibility: hidden;" title="-100 to 100, % of image width">
                                                                                     <label for="min2" class="input-group-text">Min:</label>
                                                                                     <input name="min2" type="number" class="form-control" id="min2" min="-100" max="100" value="-20">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="-100 to 100, % of image width">
+                                                                                <div class="input-group range2 tt" style="visibility: hidden;" title="-100 to 100, % of image width">
                                                                                     <label for="max2" class="input-group-text">Max:</label>
                                                                                     <input name="max2" type="number" class="form-control" id="max2" min="-100" max="100" value="20">
                                                                                 </div>
@@ -195,16 +195,16 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-9">
-                                                                    <div id="range3" style="visibility: hidden;">
+                                                                    <div id="range3">
                                                                         <div class="row g-2">
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
+                                                                                <div class="input-group range3 tt" style="visibility: hidden;" title="-100 to 100, % of image height">
                                                                                     <label for="min3" class="input-group-text">Min:</label>
                                                                                     <input name="min3" type="number" class="form-control" id="min3" min="-100" max="100" value="-20">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
+                                                                                <div class="input-group range3 tt" style="visibility: hidden;" title="-100 to 100, % of image height">
                                                                                     <label for="max3" class="input-group-text">Max:</label>
                                                                                     <input name="max3" type="number" class="form-control" id="max3" min="-100" max="100" value="20">
                                                                                 </div>
@@ -226,16 +226,16 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-9">
-                                                                    <div id="range4" style="visibility: hidden;">
+                                                                    <div id="range4">
                                                                         <div class="row g-2">
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="-100 to 100, % of image width">
+                                                                                <div class="input-group range4 tt" style="visibility: hidden;" title="-100 to 100, % of image width">
                                                                                     <label for="min4" class="input-group-text">Min:</label>
                                                                                     <input name="min4" type="number" class="form-control" id="min4" min="-100" max="100" value="-20">
                                                                                 </div> 
                                                                             </div> 
                                                                             <div class="col-5"> 
-                                                                                <div class="input-group tt" title="-100 to 100, % of image width"> 
+                                                                                <div class="input-group range4 tt" style="visibility: hidden;" title="-100 to 100, % of image width"> 
                                                                                     <label for="max4" class="input-group-text">Max:</label> 
                                                                                     <input name="max4" type="number" class="form-control" id="max4" min="-100" max="100" value="20">
                                                                                 </div>
@@ -257,16 +257,16 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-9">
-                                                                    <div id="range5" style="visibility: hidden;">
+                                                                    <div id="range5">
                                                                         <div class="row g-2">
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
+                                                                                <div class="input-group range5 tt" style="visibility: hidden;" title="-100 to 100, % of image height">
                                                                                     <label for="min5" class="input-group-text">Min:</label>
                                                                                     <input name="min5" type="number" class="form-control" id="min5" min="-100" max="100" value="-20">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col-5">
-                                                                                <div class="input-group tt" title="-100 to 100, % of image height">
+                                                                                <div class="input-group range5 tt" style="visibility: hidden;" title="-100 to 100, % of image height">
                                                                                     <label for="max5" class="input-group-text">Max:</label>
                                                                                     <input name="max5" type="number" class="form-control" id="max5" min="-100" max="100" value="20">
                                                                                 </div>
@@ -288,16 +288,16 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-9">
-                                                                    <div id="range8" style="visibility: hidden;">
+                                                                    <div id="range8" >
                                                                         <div class="row g-2">
                                                                             <div class="col">
-                                                                                <div class="input-group tt" title="-180 to 180, angle in degrees">
+                                                                                <div class="input-group range8 tt" style="visibility: hidden;" title="-180 to 180, angle in degrees">
                                                                                     <label for="min8" class="input-group-text">Min:</label>
                                                                                     <input name="min8" type="number" class="form-control" id="min8" min="-180" max="180" value="-45">
                                                                                 </div>
                                                                             </div>
                                                                             <div class="col">
-                                                                                <div class="input-group tt" title="-180 to 180, angle in degrees">
+                                                                                <div class="input-group range8 tt" style="visibility: hidden;" title="-180 to 180, angle in degrees">
                                                                                     <label for="max8" class="input-group-text">Max:</label>
                                                                                     <input name="max8" type="number" class="form-control" id="max8" min="-180" max="180" value="45">
                                                                                 </div>
@@ -361,16 +361,16 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <div id="range9" style="visibility: hidden;">
+                                                    <div id="range9">
                                                         <div class="row g-2">
                                                             <div class="col">
-                                                                <div class="input-group tt" title="1 to 14, number of augmentations applied">
+                                                                <div class="input-group range9 tt" style="visibility: hidden;" title="1 to 14, number of augmentations applied">
                                                                     <label for="min9" class="input-group-text">N:</label>
                                                                     <input name="min9" type="number" class="form-control" min="1" max="13" value="2">
                                                                 </div>
                                                             </div>
                                                             <div class="col">
-                                                                <div class="input-group tt" title="1 to 30, magnitude of the augmentation. Higher magnitude means stronger augmentation">
+                                                                <div class="input-group range9 tt" style="visibility: hidden;" title="1 to 30, magnitude of the augmentation. Higher magnitude means stronger augmentation">
                                                                     <label for="max9" class="input-group-text">M:</label>
                                                                     <input name="max9" type="number" class="form-control" min="1" max="30" value="9">
                                                                 </div>
@@ -421,9 +421,9 @@
             
             $('input:checkbox').change(function() {
                 if ($(this).is(':checked')) {
-                $('#range'+this.parentNode.id).css('visibility','visible');
+                $('.range'+this.parentNode.id).css('visibility','visible');
                 } else {
-                $('#range'+this.parentNode.id).css('visibility','hidden');
+                $('.range'+this.parentNode.id).css('visibility','hidden');
                 }
             });
 
