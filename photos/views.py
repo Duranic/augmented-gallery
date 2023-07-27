@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Dataset
 from django.conf import settings
-from .forms import CreateUserForm
+from .forms import CreateUserForm, UserForm
 from django.http import JsonResponse, FileResponse, HttpResponseBadRequest, HttpResponse
 from html import unescape
 from ast import literal_eval
@@ -70,6 +70,7 @@ def registerPage(request):
 
 
 def loginPage(request):
+    form=UserForm()
     if request.method=="POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -79,10 +80,10 @@ def loginPage(request):
             login(request, user)
             return redirect("home")
         else:
-            context={'page':'Login', 'error_message': 'Username or password entered was incorrect'}
+            context={'page':'Login', 'error_message': 'Username or password entered was incorrect', 'form': form}
             return render(request, "photos/login.html", context)
 
-    context={'page':'Login'}
+    context={'page':'Login', 'form': form}
     return render(request, "photos/login.html", context)
 
 
@@ -136,7 +137,8 @@ def uploadDataset(request):
                 zip_ref.extractall(dataset_path)
         except Exception as e:
             print(e)
-            return JsonResponse({"message": "Unable to extract .zip file. Check if you uploaded a valid file."})
+            # return JsonResponse({"message": "Unable to extract .zip file. Check if you uploaded a valid file."})
+            return JsonResponse({"error": "Unable to extract .zip file. Check if you uploaded a valid file."}, status=500)
 
         new_dataset = Dataset(user=user, name=zip_file)
         new_dataset.save()   

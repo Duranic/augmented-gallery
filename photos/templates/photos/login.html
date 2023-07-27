@@ -15,14 +15,7 @@
                 <h1>Login</h1>
                 <form action="" method="POST">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="username">Username:</label>
-                        <input id="username" class="form-control" name="username" placeholder="Enter username">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password">Password:</label>
-                        <input id="password" type="password" class="form-control" name="password" placeholder="Password">
-                    </div>
+                    {{form.as_p}}
 
                     <button type="submit" class="btn btn-dark">Log in</button>
                     <div>{{ error_message }}</div>
