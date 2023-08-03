@@ -17,10 +17,11 @@ import os, shutil
 from imgaug import augmenters as iaa
 import numpy as np
 import tempfile
+import traceback
 
 
 def home(request):
-    if request.user.is_authenticated==False:
+    if not request.user.is_authenticated:
         context = {'page':'Home'}
         return render(request, 'photos/index.html', context)
     
@@ -137,7 +138,6 @@ def uploadDataset(request):
                 zip_ref.extractall(dataset_path)
         except Exception as e:
             print(e)
-            # return JsonResponse({"message": "Unable to extract .zip file. Check if you uploaded a valid file."})
             return JsonResponse({"error": "Unable to extract .zip file. Check if you uploaded a valid file."}, status=500)
 
         new_dataset = Dataset(user=user, name=zip_file)
@@ -309,7 +309,7 @@ def augmentDataset(request):
                         
                         for i in range(numberOfImages):
                             # Apply the augmentations
-                            
+
                             augmented_image = seq.augment_image(image)
                             augmented_image_pil = Image.fromarray(augmented_image)
                             # Save the augmented image in the same directory
@@ -317,8 +317,8 @@ def augmentDataset(request):
                             augmented_image_pil.save(augmented_file_path, format='PNG')
         except Exception as e:
             print(f"An exception occurred: {e}")
-
-            return JsonResponse({"message": "An error occured, likely because a previous augmentation process was still running. Please wait a minute and try starting a new augmentation."})
+            print(traceback.format_exc())
+            return JsonResponse({"message": "An error occured. Please try again."})
         return JsonResponse({'message': "Succesfully augmented the dataset, your download will begin shortly..."})
     return redirect("home")
 

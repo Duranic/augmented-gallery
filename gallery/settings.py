@@ -28,7 +28,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
-CSRF_TRUSTED_ORIGINS = ['https://augmentiotest.azurewebsites.net']
+CSRF_TRUSTED_ORIGINS = ['https://augmentio.azurewebsites.net']
 
 LOGIN_URL="/login/"
 
