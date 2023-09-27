@@ -1,0 +1,120 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %} {{ page }} {% endblock title %}
+
+
+{% block content %}
+
+<style>
+    .card-img {
+        max-height: 150px;
+        width: auto;
+        height: auto;
+    }
+
+    .center {
+        display: flex;
+        align-items: center;
+    }
+
+    .links {
+        color: inherit;
+        font-weight: 500;
+        text-decoration: inherit;
+        display: block;
+    }
+
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        {% if user.is_authenticated %}
+            {% if datasetName is not None %}
+            <div class="col-md-3">
+                <div class="card my-2">
+                    <div class="card-header">
+                        Manage dataset
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'delete' %}">Delete the dataset</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'upload' %}">Upload new dataset</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'augment' %}">Augment dataset</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card my-2">
+                    <div class="card">
+                        <div class="row no-gutters">
+                            <div class="col-md-3">
+                                <img src="{% static 'dataset.png' %}" class="card-img">
+                            </div>
+                            <div class="col-md-9">
+                                <div class="card-body">
+                                    <h4 class="card-title">{{datasetName}}</h4>
+                                    <h5 class="card-text">Date added: {{creationDate}}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-md-3">
+                <div class="card my-2">
+                    <div class="card-header">
+                        Manage dataset
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <a class="links" href="{% url 'upload' %}">Upload new dataset</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div class="col-md-9">
+                <div class="card my-2">
+                    <h3 class="m-3">Please upload a dataset</h3>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+        <div class="col-md-9">
+            <h3 class="text-center"><a class="link-dark" href="{% url 'login' %}">Login</a> or <a class="link-dark" href="{% url 'register' %}">register</a> to access all features</h3>
+            <p class="text-center">With an account you can upload your dataset, select augmentations and preview the results.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% if user.is_authenticated is False %}
+    <div class="row mt-5 justify-content-center">
+        <div class="col-md">
+            <h3 class="text-center">About Augment.io</h3>
+            <h5>Welcome to Augment.io, a web application for simple, no-code image dataset augmentation. Augment.io is designed to simplify the process of enhancing image datasets for computer vision projects.</h5>
+            <p>Key Features:</p>
+            <ul>
+                <li><strong>Cloud-Based Augmentation:</strong> Augment.io is deployed on the cloud, allowing you to augment your image datasets from anywhere, anytime. All you need is an internet connection, and you're ready to go!</li>
+                <li><strong>Dataset Storage:</strong> Store your image dataset securely on this platform.</li>
+                <li><strong>Select and Preview Augmentations:</strong> Augmentio offers a wide range of augmentation options, including flipping, rotation, color adjustments, and more. RandAugment is also implemented to simplify augmentation selection.</li>
+                <li><strong>Download Your Augmented Dataset:</strong> With a single click, you can download your augmented dataset. Augment.io ensures that the folder structure of your dataset is preserved.</li>
+            </ul>
+            
+    </div>
+    <div class="row">
+        <div class="col-md text-center">
+            <a href="{% url 'register' %}" class="text-center btn btn-dark">Create a free account</a></div>
+        </div>
+    </div>
+    {% endif %}
+</div
+
+{% endblock content %}
